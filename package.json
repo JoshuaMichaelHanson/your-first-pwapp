@@ -2,25 +2,25 @@
   "name": "your-first-pwapp",
   "version": "2.0.0",
   "description": "Codelab for Your First PWAPP",
-  "homepage": "https://codelabs.developers.google.com/codelabs/your-first-pwapp/",
+  "homepage": "https://weather.wilderness-code-clan.com/",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.16.4",
+    "express": "^5.2.1",
     "express-http-to-https": "^1.1.4",
-    "node-fetch": "^2.3.0"
+    "node-fetch": "^3.3.2"
   },
   "engines": {
-    "node": "8.x"
+    "node": ">=20.19.0"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/googlecodelabs/your-first-pwapp.git"
+    "url": "https://github.com/JoshuaMichaelHanson/your-first-pwapp.git"
   },
   "bugs": {
-    "url": "https://github.com/googlecodelabs/your-first-pwapp/issues"
+    "url": "https://github.com/JoshuaMichaelHanson/your-first-pwapp/issues"
   },
   "license": "Apache2",
   "keywords": [

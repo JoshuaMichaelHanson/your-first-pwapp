@@ -2,3 +2,10 @@
 .DS_Store
 node_modules
 package-lock.json
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/your-first-pwapp-1.iml
+.idea
+./.idea
+
