@@ -19,17 +19,15 @@
 'use strict';
 
 const express = require('express');
-const fetch = require('node-fetch');
 const redirectToHTTPS = require('express-http-to-https').redirectToHTTPS;
 
 // CODELAB: Change this to add a delay (ms) before the server responds.
 const FORECAST_DELAY = 0;
 
-// CODELAB: If running locally, set your Dark Sky API key here
-const API_KEY = process.env.DARKSKY_API_KEY;
-const BASE_URL = `https://api.darksky.net/forecast`;
+// Open-Meteo API Base URL
+const BASE_URL = 'https://api.open-meteo.com/v1/forecast';
 
-// Fake forecast data used if we can't reach the Dark Sky API
+// Fake forecast data used if we can't reach the API
 const fakeForecast = {
   fakeData: true,
   latitude: 0,
@@ -115,6 +113,30 @@ const fakeForecast = {
 };
 
 /**
+ * Maps Open-Meteo WMO weather codes to Dark Sky icon names.
+ * @param {number} code WMO weather code
+ * @param {boolean} isDay Whether it is day or night
+ * @return {string} Dark Sky icon name
+ */
+function mapWeatherCodeToIcon(code, isDay = true) {
+  // WMO Code mapping
+  // 0: Clear sky
+  if (code === 0) return isDay ? 'clear-day' : 'clear-night';
+  // 1, 2, 3: Mainly clear, partly cloudy, and overcast
+  if ([1, 2, 3].includes(code)) return isDay ? 'partly-cloudy-day' : 'partly-cloudy-night';
+  // 45, 48: Fog
+  if ([45, 48].includes(code)) return 'fog';
+  // 51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82: Drizzle, Rain, Showers
+  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return 'rain';
+  // 71, 73, 75, 77, 85, 86: Snow
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return 'snow';
+  // 95, 96, 99: Thunderstorm
+  if ([95, 96, 99].includes(code)) return 'rain';
+
+  return 'clear-day'; // Default
+}
+
+/**
  * Generates a fake forecast in case the weather API is not available.
  *
  * @param {String} location GPS location to use.
@@ -133,25 +155,55 @@ function generateFakeForecast(location) {
 
 
 /**
- * Gets the weather forecast from the Dark Sky API for the given location.
+ * Gets the weather forecast from the Open-Meteo API for the given location.
  *
  * @param {Request} req request object from Express.
  * @param {Response} resp response object from Express.
  */
 function getForecast(req, resp) {
   const location = req.params.location || '40.7720232,-73.9732319';
-  const url = `${BASE_URL}/${API_KEY}/${location}`;
+  const [lat, lon] = location.split(',');
+
+  // Open-Meteo URL
+  const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=auto&timeformat=unixtime`;
+
   fetch(url).then((resp) => {
     if (resp.status !== 200) {
       throw new Error(resp.statusText);
     }
     return resp.json();
   }).then((data) => {
+    // Transform Open-Meteo data to Dark Sky format
+    const darkSkyData = {
+      latitude: data.latitude,
+      longitude: data.longitude,
+      timezone: data.timezone,
+      currently: {
+        time: data.current.time,
+        summary: mapWeatherCodeToIcon(data.current.weather_code, !!data.current.is_day),
+        icon: mapWeatherCodeToIcon(data.current.weather_code, !!data.current.is_day),
+        temperature: data.current.temperature_2m,
+        humidity: data.current.relative_humidity_2m / 100,
+        windSpeed: data.current.wind_speed_10m,
+        windBearing: data.current.wind_direction_10m,
+      },
+      daily: {
+        data: data.daily.time.map((time, index) => ({
+          time: time,
+          icon: mapWeatherCodeToIcon(data.daily.weather_code[index]),
+          sunriseTime: data.daily.sunrise[index],
+          sunsetTime: data.daily.sunset[index],
+          temperatureHigh: data.daily.temperature_2m_max[index],
+          temperatureLow: data.daily.temperature_2m_min[index],
+        }))
+      }
+    };
+
     setTimeout(() => {
-      resp.json(data);
+      resp.json(darkSkyData);
     }, FORECAST_DELAY);
   }).catch((err) => {
-    console.error('Dark Sky API Error:', err.message);
+    console.error('Open-Meteo API Error:', err.message);
     resp.json(generateFakeForecast(location));
   });
 }
