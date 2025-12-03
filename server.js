@@ -155,6 +155,17 @@ function generateFakeForecast(location) {
 
 
 /**
+ * Converts wind direction in degrees to cardinal direction.
+ * @param {number} degrees Wind direction in degrees
+ * @return {string} Cardinal direction (e.g., "N", "NE", "E")
+ */
+function degreesToCardinal(degrees) {
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+  const index = Math.round(degrees / 45) % 8;
+  return directions[index];
+}
+
+/**
  * Gets the weather forecast from the Open-Meteo API for the given location.
  *
  * @param {Request} req request object from Express.
@@ -164,8 +175,8 @@ function getForecast(req, resp) {
   const location = req.params.location || '40.7720232,-73.9732319';
   const [lat, lon] = location.split(',');
 
-  // Open-Meteo URL
-  const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=auto&timeformat=unixtime&forecast_days=8`;
+  // Open-Meteo URL - Requesting Fahrenheit, MPH, Inch, and 8 days
+  const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=auto&timeformat=unixtime&forecast_days=8&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`;
 
   fetch(url).then((resp) => {
     if (resp.status !== 200) {
@@ -185,7 +196,7 @@ function getForecast(req, resp) {
         temperature: data.current.temperature_2m,
         humidity: data.current.relative_humidity_2m / 100,
         windSpeed: data.current.wind_speed_10m,
-        windBearing: data.current.wind_direction_10m,
+        windBearing: degreesToCardinal(data.current.wind_direction_10m), // Converted to Cardinal
       },
       daily: {
         data: data.daily.time.map((time, index) => ({
