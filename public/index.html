@@ -59,130 +59,6 @@
 
     <button id="butAdd" class="fab" aria-label="Add">
       <span class="icon add"></span>
-    </button>
-
-    <button id="getCurrentLocation" class="loc" aria-label="NWS Point Forcast">
-      <span class="icon locate"></span>
-    </button>
-
-    <div id="weather-template" class="weather-card" hidden>
-      <div class="card-spinner">
-        <svg viewBox="0 0 32 32" width="32" height="32">
-          <circle cx="16" cy="16" r="14" fill="none"></circle>
-        </svg>
-      </div>
-      <button class="remove-city">&times;</button>
-      <div class="city-key" hidden></div>
-      <div class="card-last-updated" hidden></div>
-      <div class="location open-nws">&nbsp;</div>
-      <div class="date">&nbsp;</div>
-      <div class="description">&nbsp;</div>
-      <div class="current">
-        <div class="visual">
-          <div class="icon"></div>
-          <div class="temperature">
-            <span class="value"></span><span class="scale">°F</span>
-          </div>
-        </div>
-        <div class="description">
-          <div class="humidity">
-            <span class="label">Humidity:</span>
-            <span class="value"></span><span class="scale">%</span>
-          </div>
-          <div class="wind">
-            <span class="label">Wind:</span>
-            <span class="value"></span>
-            <span class="scale">mph</span>
-            <span class="direction"></span>°
-          </div>
-          <div class="sunrise">
-            <span class="label">Sunrise:</span>
-            <span class="value"></span>
-          </div>
-          <div class="sunset">
-            <span class="label">Sunset:</span>
-            <span class="value"></span>
-          </div>
-        </div>
-      </div>
-      <div class="future">
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-        <div class="oneday">
-          <div class="date"></div>
-          <div class="icon"></div>
-          <div class="temp-high">
-            <span class="value"></span>°
-          </div>
-          <div class="temp-low">
-            <span class="value"></span>°
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <div id="addDialogContainer">
-    <div class="dialog">
-      <div class="dialog-title">Add <b>'Current Location'</b> <br /> or choose an existing one</div>
       <div class="dialog-body">
         <div class="input-div">
           <input type="text" id="newLocationName" placeholder="Location Name" />
@@ -208,24 +84,24 @@
         <button id="butDialogCancel" class="button">Cancel</button>
         <button id="butDialogAdd" class="button">Add</button>
       </div>
-    </div>
-  </div>
+      </div>
+      </div>
 
-  <script src="/scripts/luxon-1.11.4.js"></script>
-  <script src="/scripts/app.js"></script>
-  <!-- CODELAB: Add the install script here -->
-  <script src="/scripts/install.js"></script>
-  <script>
-    // CODELAB: Register service worker.
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then((reg) => {
-            console.log('Service worker registered.', reg);
+      <script src="/scripts/luxon-1.11.4.js"></script>
+      <script src="/scripts/app.js"></script>
+      <!-- CODELAB: Add the install script here -->
+      <script src="/scripts/install.js"></script>
+      <script>
+        // CODELAB: Register service worker.
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+              .then((reg) => {
+                console.log('Service worker registered.', reg);
+              });
           });
-      });
-    }
-  </script>
+        }
+      </script>
 
 </body>
 

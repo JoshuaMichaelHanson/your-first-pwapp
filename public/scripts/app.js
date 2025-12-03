@@ -161,12 +161,22 @@ function renderForecast(card, data) {
     .setZone(data.timezone)
     .toFormat("DDDD t");
   card.querySelector(".date").textContent = forecastFrom;
+
+  // Elevation
+  if (data.elevation) {
+    card.querySelector(".elevation").textContent = `${Math.round(data.elevation)} F`;
+  }
+
   card.querySelector(
     ".current .icon"
   ).className = `icon ${data.currently.icon}`;
   card.querySelector(".current .temperature .value").textContent = Math.round(
     data.currently.temperature
   );
+
+  // Current Snow Fall
+  card.querySelector(".current .visual .snow-fall .value").textContent = data.currently.snowFall || 0;
+
   card.querySelector(".current .humidity .value").textContent = Math.round(
     data.currently.humidity * 100
   );
@@ -175,6 +185,11 @@ function renderForecast(card, data) {
   );
   card.querySelector(".current .wind .direction").textContent =
     data.currently.windBearing;
+
+  // Current Snow Depth (convert feet to inches)
+  const snowDepthInches = (data.currently.snowDepth || 0) * 12;
+  card.querySelector(".current .snow-depth .value").textContent = Math.round(snowDepthInches * 10) / 10;
+
   const sunrise = luxon.DateTime.fromSeconds(data.daily.data[0].sunriseTime)
     .setZone(data.timezone)
     .toFormat("t");
@@ -192,6 +207,11 @@ function renderForecast(card, data) {
       .setZone(data.timezone)
       .toFormat("ccc");
     tile.querySelector(".date").textContent = forecastFor;
+
+    // Future Precip Prob and Snow Fall
+    tile.querySelector(".precip-prob .value").textContent = forecast.precipitationProbability || 0;
+    tile.querySelector(".snow-fall .value").textContent = forecast.snowFall || 0;
+
     tile.querySelector(".icon").className = `icon ${forecast.icon}`;
     tile.querySelector(".temp-high .value").textContent = Math.round(
       forecast.temperatureHigh
