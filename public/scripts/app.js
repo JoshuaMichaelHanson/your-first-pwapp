@@ -83,9 +83,9 @@ function renderForecast(card, data) {
   const lastUpdated = parseInt(cardLastUpdated);
 
   // If the data on the element is newer, skip the update.
-  if (lastUpdated >= data.currently.time) {
-    return;
-  }
+  // if (lastUpdated >= data.currently.time) {
+  //   return;
+  // }
   cardLastUpdatedElem.textContent = data.currently.time;
 
   // Render the forecast data into the card.
