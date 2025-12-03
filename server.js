@@ -143,6 +143,7 @@ function mapWeatherCodeToIcon(code, isDay = true) {
  * @return {Object} forecast object.
  */
 function generateFakeForecast(location) {
+  console.log('Generating fake forecast for location:', location);
   location = location || '40.7720232,-73.9732319';
   const commaAt = location.indexOf(',');
 
@@ -175,26 +176,35 @@ function getForecast(req, resp) {
   const location = req.params.location || '40.7720232,-73.9732319';
   const [lat, lon] = location.split(',');
 
+  // &daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,sunrise,sunset,precipitation_probability_max&models=best_match&current=temperature_2m,is_day,weather_code,wind_speed_10m,snowfall,relative_humidity_2m,wind_direction_10m&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch
   // Open-Meteo URL - Requesting Fahrenheit, MPH, Inch, and 8 days
-  const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=auto&timeformat=unixtime&forecast_days=8&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`;
+  // const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=auto&timeformat=unixtime&forecast_days=8&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`;
 
+  const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,sunrise,sunset,precipitation_probability_max&models=best_match&current=temperature_2m,is_day,weather_code,wind_speed_10m,snowfall,relative_humidity_2m,wind_direction_10m&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch`;
+
+  console.log('Fetching Open-Meteo Data:', url);
   fetch(url).then((resp) => {
     if (resp.status !== 200) {
       throw new Error(resp.statusText);
     }
     return resp.json();
   }).then((data) => {
+    console.log('Open-Meteo Data:', data);
     // Transform Open-Meteo data to Dark Sky format
     const darkSkyData = {
       latitude: data.latitude,
       longitude: data.longitude,
       timezone: data.timezone,
+      elevation: data.elevation,
       currently: {
         time: data.current.time,
         summary: mapWeatherCodeToIcon(data.current.weather_code, !!data.current.is_day),
         icon: mapWeatherCodeToIcon(data.current.weather_code, !!data.current.is_day),
         temperature: data.current.temperature_2m,
         humidity: data.current.relative_humidity_2m / 100,
+        snowFall: data.current.snowfall,
+        snowDepth: data.current.snow_depth,
+        relativeHumidity: data.current.relative_humidity_2m,
         windSpeed: data.current.wind_speed_10m,
         windBearing: degreesToCardinal(data.current.wind_direction_10m), // Converted to Cardinal
       },
@@ -206,11 +216,15 @@ function getForecast(req, resp) {
           sunsetTime: data.daily.sunset[index],
           temperatureHigh: data.daily.temperature_2m_max[index],
           temperatureLow: data.daily.temperature_2m_min[index],
+          snowFall: data.daily.snowfall_sum[index],
+          precipitationProbability: data.daily.precipitation_probability_max[index],
         }))
       }
     };
+    console.log('Converted to Dark Sky Data:', darkSkyData);
 
     setTimeout(() => {
+      console.log('Sending Dark Sky Data:', darkSkyData);
       resp.json(darkSkyData);
     }, FORECAST_DELAY);
   }).catch((err) => {

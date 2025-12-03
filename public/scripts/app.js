@@ -41,14 +41,37 @@ function addLocation() {
   const geo = selected.value;
   const label = selected.textContent;
   const location = { label: label, geo: geo };
+  console.log('GEO...', geo);
+  if (geo !== 'current') {
+    createCardAndUpdateSavedList(location);
+  } else {
+    console.log('Need to get the current geo');
+    if (navigator.geolocation) {
+      console.log("Navigator enabled!");
+      navigator.geolocation.getCurrentPosition(getCoordsInfo, geoError);
+    } else {
+      console.log("Geo-location not supported");
+    }
+  }
+}
+
+function createCardAndUpdateSavedList(location) {
   // Create a new card & get the weather data from the server
   const card = getForecastCard(location);
-  getForecastFromNetwork(geo).then(forecast => {
+  getForecastFromNetwork(location.geo).then(forecast => {
     renderForecast(card, forecast);
   });
   // Save the updated list of selected cities.
-  weatherApp.selectedLocations[geo] = location;
+  weatherApp.selectedLocations[location.geo] = location;
   saveLocationList(weatherApp.selectedLocations);
+}
+
+function getCoordsInfo(position) {
+  console.log('getCoordsInfo');
+  const geo = position.coords.latitude + ',' + position.coords.longitude;
+  const label = document.getElementById("newLocationName").value;
+  const location = { label: label, geo: geo };
+  createCardAndUpdateSavedList(location);
 }
 
 /**
@@ -63,6 +86,50 @@ function removeLocation(evt) {
     delete weatherApp.selectedLocations[parent.id];
     saveLocationList(weatherApp.selectedLocations);
   }
+}
+
+function openNws(evt) {
+  const parent = evt.srcElement.parentElement;
+  console.log("Hi its me id=", parent.id);
+  // window.open("https://www.w3schools.com");
+  // need to split the lat and longitude
+  let coords = parent.id.split(",");
+  console.log("Coords ", coords);
+  // https://forecast.weather.gov/MapClick.php?lat=44.0136&lon=-92.4757&unit=0&lg=english&FcstType=graphical
+  const openUrl =
+    "https://forecast.weather.gov/MapClick.php?lat=" +
+    coords[0] +
+    "&lon=" +
+    coords[1] +
+    "&unit=0&lg=english&FcstType=graphical";
+  console.log('Open from name ', openUrl);
+  window.open(openUrl);
+}
+
+function openCurrentLoc(position) {
+  console.log("Position", position);
+  const openUrl =
+    "https://forecast.weather.gov/MapClick.php?lat=" +
+    position.coords.latitude +
+    "&lon=" +
+    position.coords.longitude +
+    "&unit=0&lg=english&FcstType=graphical";
+  console.log("Open from current location", openUrl);
+  window.open(openUrl);
+}
+
+function openNwsWithCurrentLocation() {
+  console.log("Open with safari?");
+  if (navigator.geolocation) {
+    console.log("Navigator enabled!");
+    navigator.geolocation.getCurrentPosition(openCurrentLoc, geoError);
+  } else {
+    console.log("Geo-location not supported");
+  }
+}
+
+function geoError(err) {
+  console.log("Error with getCurrentPosition", err);
 }
 
 /**
@@ -201,6 +268,8 @@ function getForecastCard(location) {
   newCard
     .querySelector(".remove-city")
     .addEventListener("click", removeLocation);
+  // add listener to open weather.gov
+  newCard.querySelector(".open-nws").addEventListener("click", openNws);
   document.querySelector("main").appendChild(newCard);
   newCard.removeAttribute("hidden");
   return newCard;
@@ -276,6 +345,9 @@ function init() {
   document
     .getElementById("butDialogAdd")
     .addEventListener("click", addLocation);
+  document
+    .getElementById("getCurrentLocation")
+    .addEventListener("click", openNwsWithCurrentLocation);
 }
 
 init();
