@@ -30,11 +30,33 @@ const BASE_URL = 'https://api.open-meteo.com/v1/forecast';
 // Fake forecast data used if we can't reach the API
 const fakeForecast = {
   fakeData: true,
-  latitude: 0,
-  longitude: 0,
-  timezone: 'America/New_York',
-  currently: {
+  latitude: 44.3,
+  longitude: -92.4,
+  timezone: 'America/Chicago',
+  elevation: 406,
+  current_units: {
+    time: 'unixtime',
+    interval: 'seconds',
+    temperature_2m: '°F',
+    is_day: '',
+    weather_code: 'wmo code',
+    wind_speed_10m: 'mp/h',
+    snowfall: 'inch',
+    snow_depth: 'ft',
+    relative_humidity_2m: '%',
+    wind_direction_10m: '°'
+  },
+  current: {
     time: 0,
+    interval: 900,
+    temperature_2m: -4.2,
+    is_day: 0,
+    weather_code: 1,
+    wind_speed_10m: 6.9,
+    snowfall: 0,
+    snow_depth: 0.656,
+    relative_humidity_2m: 77,
+    wind_direction_10m: 339,
     summary: 'Clear',
     icon: 'clear-day',
     temperature: 43.4,
@@ -42,71 +64,105 @@ const fakeForecast = {
     windSpeed: 3.74,
     windBearing: 208,
   },
+  daily_units: {
+    time: 'unixtime',
+    weather_code: 'wmo code',
+    temperature_2m_max: '°F',
+    temperature_2m_min: '°F',
+    snowfall_sum: 'inch',
+    sunrise: 'unixtime',
+    sunset: 'unixtime',
+    precipitation_probability_max: '%'
+  },
   daily: {
     data: [
       {
         time: 0,
-        icon: 'partly-cloudy-night',
-        sunriseTime: 1553079633,
-        sunsetTime: 1553123320,
+        interval: 86400,
+        weather_code: 3,
+        temperature_2m_max: 12.7,
+        temperature_2m_min: -6.6,
+        snowfall_sum: 0,
+        sunrise: 1764854830,
+        sunset: 1764887602,
         temperatureHigh: 52.91,
         temperatureLow: 41.35,
       },
       {
         time: 86400,
-        icon: 'rain',
-        sunriseTime: 1553165933,
-        sunsetTime: 1553209784,
+        interval: 86400,
+        weather_code: 51,
+        temperature_2m_max: 30.3,
+        temperature_2m_min: 13.7,
+        snowfall_sum: 0.007,
+        sunrise: 1764941292,
+        sunset: 1764973991,
         temperatureHigh: 48.01,
         temperatureLow: 44.17,
       },
       {
         time: 172800,
-        icon: 'rain',
-        sunriseTime: 1553252232,
-        sunsetTime: 1553296247,
+        interval: 86400,
+        weather_code: 71,
+        temperature_2m_max: 19.9,
+        temperature_2m_min: -0.6,
+        snowfall_sum: 0,
+        sunrise: 1765027752,
+        sunset: 1765060382,
         temperatureHigh: 50.31,
         temperatureLow: 33.61,
       },
       {
         time: 259200,
-        icon: 'partly-cloudy-night',
-        sunriseTime: 1553338532,
-        sunsetTime: 1553382710,
+        interval: 86400,
+        weather_code: 73,
+        temperature_2m_max: 10.1,
+        temperature_2m_min: -11.8,
+        snowfall_sum: 0.331,
+        sunrise: 1765114210,
+        sunset: 1765146776,
         temperatureHigh: 46.44,
         temperatureLow: 33.82,
       },
       {
         time: 345600,
-        icon: 'partly-cloudy-night',
-        sunriseTime: 1553424831,
-        sunsetTime: 1553469172,
-        temperatureHigh: 60.5,
-        temperatureLow: 43.82,
+        interval: 86400,
+        weather_code: 3,
+        temperature_2m_max: 60.5,
+        temperature_2m_min: 43.82,
+        snowfall_sum: 0,
+        sunrise: 1765200666,
+        sunset: 1765233172,
       },
       {
         time: 432000,
-        icon: 'rain',
-        sunriseTime: 1553511130,
-        sunsetTime: 1553555635,
-        temperatureHigh: 61.79,
-        temperatureLow: 32.8,
+        interval: 86400,
+        weather_code: 51,
+        temperature_2m_max: 61.79,
+        temperature_2m_min: 32.8,
+        snowfall_sum: 0,
+        sunrise: 1765287120,
+        sunset: 1765319570,
       },
       {
         time: 518400,
-        icon: 'rain',
-        sunriseTime: 1553597430,
-        sunsetTime: 1553642098,
-        temperatureHigh: 48.28,
-        temperatureLow: 33.49,
+        interval: 86400,
+        weather_code: 51,
+        temperature_2m_max: 61.79,
+        temperature_2m_min: 32.8,
+        snowfall_sum: 0,
+        sunrise: 1765287120,
+        sunset: 1765319570,
       },
       {
         time: 604800,
-        icon: 'snow',
-        sunriseTime: 1553683730,
-        sunsetTime: 1553728560,
-        temperatureHigh: 43.58,
-        temperatureLow: 33.68,
+        interval: 86400,
+        weather_code: 51,
+        temperature_2m_max: 61.79,
+        temperature_2m_min: 32.8,
+        snowfall_sum: 0,
+        sunrise: 1765287120,
+        sunset: 1765319570,
       },
     ],
   },
@@ -180,7 +236,7 @@ function getForecast(req, resp) {
   // Open-Meteo URL - Requesting Fahrenheit, MPH, Inch, and 8 days
   // const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,wind_gusts_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_sum,rain_sum,showers_sum,snowfall_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant&timezone=auto&timeformat=unixtime&forecast_days=8&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`;
 
-  const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,sunrise,sunset,precipitation_probability_max&models=best_match&current=temperature_2m,is_day,weather_code,wind_speed_10m,snowfall,relative_humidity_2m,wind_direction_10m&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch`;
+  const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,snowfall_sum,sunrise,sunset,precipitation_probability_max&models=best_match&current=temperature_2m,is_day,weather_code,wind_speed_10m,snowfall,snow_depth,relative_humidity_2m,wind_direction_10m&timezone=auto&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch&timeformat=unixtime&forecast_days=8`;
 
   console.log('Fetching Open-Meteo Data:', url);
   fetch(url).then((resp) => {
@@ -190,6 +246,14 @@ function getForecast(req, resp) {
     return resp.json();
   }).then((data) => {
     console.log('Open-Meteo Data:', data);
+
+    const toSeconds = (t) => {
+      if (typeof t === 'string') {
+        return Math.floor(new Date(t).getTime() / 1000);
+      }
+      return t;
+    };
+
     // Transform Open-Meteo data to Dark Sky format
     const darkSkyData = {
       latitude: data.latitude,
@@ -197,7 +261,7 @@ function getForecast(req, resp) {
       timezone: data.timezone,
       elevation: data.elevation,
       currently: {
-        time: data.current.time,
+        time: toSeconds(data.current.time),
         summary: mapWeatherCodeToIcon(data.current.weather_code, !!data.current.is_day),
         icon: mapWeatherCodeToIcon(data.current.weather_code, !!data.current.is_day),
         temperature: data.current.temperature_2m,
@@ -210,10 +274,10 @@ function getForecast(req, resp) {
       },
       daily: {
         data: data.daily.time.map((time, index) => ({
-          time: time,
+          time: toSeconds(time),
           icon: mapWeatherCodeToIcon(data.daily.weather_code[index]),
-          sunriseTime: data.daily.sunrise[index],
-          sunsetTime: data.daily.sunset[index],
+          sunriseTime: toSeconds(data.daily.sunrise[index]),
+          sunsetTime: toSeconds(data.daily.sunset[index]),
           temperatureHigh: data.daily.temperature_2m_max[index],
           temperatureLow: data.daily.temperature_2m_min[index],
           snowFall: data.daily.snowfall_sum[index],
@@ -225,6 +289,9 @@ function getForecast(req, resp) {
 
     setTimeout(() => {
       console.log('Sending Dark Sky Data:', darkSkyData);
+      darkSkyData.daily.data.map((day) => {
+        console.log('Day:', day);
+      });
       resp.json(darkSkyData);
     }, FORECAST_DELAY);
   }).catch((err) => {

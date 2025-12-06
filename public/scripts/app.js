@@ -89,7 +89,8 @@ function removeLocation(evt) {
 }
 
 function openNws(evt) {
-  const parent = evt.srcElement.parentElement;
+  console.log('openNws', evt);
+  const parent = evt.srcElement.offsetParent;
   console.log("Hi its me id=", parent.id);
   // window.open("https://www.w3schools.com");
   // need to split the lat and longitude
@@ -348,6 +349,7 @@ function loadLocationList() {
 }
 
 /**
+ * 44.03818972735139, -92.42589161426046
  * Initialize the app, gets the list of locations from local storage, then
  * renders the initial data.
  */
