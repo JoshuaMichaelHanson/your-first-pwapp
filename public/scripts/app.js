@@ -16,62 +16,62 @@
  * limitations under the License
  */
 "use strict";
-
+console.log('app.js loaded');
 const weatherApp = {
-  selectedLocations: {},
-  addDialogContainer: document.getElementById("addDialogContainer")
+    selectedLocations: {},
+    addDialogContainer: document.getElementById("addDialogContainer")
 };
 
 /**
  * Toggles the visibility of the add location dialog box.
  */
 function toggleAddDialog() {
-  weatherApp.addDialogContainer.classList.toggle("visible");
+    weatherApp.addDialogContainer.classList.toggle("visible");
 }
 
 /**
  * Event handler for butDialogAdd, adds the selected location to the list.
  */
 function addLocation() {
-  // Hide the dialog
-  toggleAddDialog();
-  // Get the selected city
-  const select = document.getElementById("selectCityToAdd");
-  const selected = select.options[select.selectedIndex];
-  const geo = selected.value;
-  const label = selected.textContent;
-  const location = { label: label, geo: geo };
-  console.log('GEO...', geo);
-  if (geo !== 'current') {
-    createCardAndUpdateSavedList(location);
-  } else {
-    console.log('Need to get the current geo');
-    if (navigator.geolocation) {
-      console.log("Navigator enabled!");
-      navigator.geolocation.getCurrentPosition(getCoordsInfo, geoError);
+    // Hide the dialog
+    toggleAddDialog();
+    // Get the selected city
+    const select = document.getElementById("selectCityToAdd");
+    const selected = select.options[select.selectedIndex];
+    const geo = selected.value;
+    const label = selected.textContent;
+    const location = { label: label, geo: geo };
+    console.log('GEO...', geo);
+    if (geo !== 'current') {
+        createCardAndUpdateSavedList(location);
     } else {
-      console.log("Geo-location not supported");
+        console.log('Need to get the current geo');
+        if (navigator.geolocation) {
+            console.log("Navigator enabled!");
+            navigator.geolocation.getCurrentPosition(getCoordsInfo, geoError);
+        } else {
+            console.log("Geo-location not supported");
+        }
     }
-  }
 }
 
 function createCardAndUpdateSavedList(location) {
-  // Create a new card & get the weather data from the server
-  const card = getForecastCard(location);
-  getForecastFromNetwork(location.geo).then(forecast => {
-    renderForecast(card, forecast);
-  });
-  // Save the updated list of selected cities.
-  weatherApp.selectedLocations[location.geo] = location;
-  saveLocationList(weatherApp.selectedLocations);
+    // Create a new card & get the weather data from the server
+    const card = getForecastCard(location);
+    getForecastFromNetwork(location.geo).then(forecast => {
+        renderForecast(card, forecast);
+    });
+    // Save the updated list of selected cities.
+    weatherApp.selectedLocations[location.geo] = location;
+    saveLocationList(weatherApp.selectedLocations);
 }
 
 function getCoordsInfo(position) {
-  console.log('getCoordsInfo');
-  const geo = position.coords.latitude + ',' + position.coords.longitude;
-  const label = document.getElementById("newLocationName").value;
-  const location = { label: label, geo: geo };
-  createCardAndUpdateSavedList(location);
+    console.log('getCoordsInfo');
+    const geo = position.coords.latitude + ',' + position.coords.longitude;
+    const label = document.getElementById("newLocationName").value;
+    const location = { label: label, geo: geo };
+    createCardAndUpdateSavedList(location);
 }
 
 /**
@@ -80,57 +80,57 @@ function getCoordsInfo(position) {
  * @param {Event} evt
  */
 function removeLocation(evt) {
-  const parent = evt.srcElement.parentElement;
-  parent.remove();
-  if (weatherApp.selectedLocations[parent.id]) {
-    delete weatherApp.selectedLocations[parent.id];
-    saveLocationList(weatherApp.selectedLocations);
-  }
+    const parent = evt.srcElement.parentElement;
+    parent.remove();
+    if (weatherApp.selectedLocations[parent.id]) {
+        delete weatherApp.selectedLocations[parent.id];
+        saveLocationList(weatherApp.selectedLocations);
+    }
 }
 
 function openNws(evt) {
-  console.log('openNws', evt);
-  const parent = evt.srcElement.offsetParent;
-  console.log("Hi its me id=", parent.id);
-  // window.open("https://www.w3schools.com");
-  // need to split the lat and longitude
-  let coords = parent.id.split(",");
-  console.log("Coords ", coords);
-  // https://forecast.weather.gov/MapClick.php?lat=44.0136&lon=-92.4757&unit=0&lg=english&FcstType=graphical
-  const openUrl =
-    "https://forecast.weather.gov/MapClick.php?lat=" +
-    coords[0] +
-    "&lon=" +
-    coords[1] +
-    "&unit=0&lg=english&FcstType=graphical";
-  console.log('Open from name ', openUrl);
-  window.open(openUrl);
+    console.log('openNws', evt);
+    const parent = evt.srcElement.offsetParent;
+    console.log("Hi its me id=", parent.id);
+    // window.open("https://www.w3schools.com");
+    // need to split the lat and longitude
+    let coords = parent.id.split(",");
+    console.log("Coords ", coords);
+    // https://forecast.weather.gov/MapClick.php?lat=44.0136&lon=-92.4757&unit=0&lg=english&FcstType=graphical
+    const openUrl =
+        "https://forecast.weather.gov/MapClick.php?lat=" +
+        coords[0] +
+        "&lon=" +
+        coords[1] +
+        "&unit=0&lg=english&FcstType=graphical";
+    console.log('Open from name ', openUrl);
+    window.open(openUrl);
 }
 
 function openCurrentLoc(position) {
-  console.log("Position", position);
-  const openUrl =
-    "https://forecast.weather.gov/MapClick.php?lat=" +
-    position.coords.latitude +
-    "&lon=" +
-    position.coords.longitude +
-    "&unit=0&lg=english&FcstType=graphical";
-  console.log("Open from current location", openUrl);
-  window.open(openUrl);
+    console.log("Position", position);
+    const openUrl =
+        "https://forecast.weather.gov/MapClick.php?lat=" +
+        position.coords.latitude +
+        "&lon=" +
+        position.coords.longitude +
+        "&unit=0&lg=english&FcstType=graphical";
+    console.log("Open from current location", openUrl);
+    window.open(openUrl);
 }
 
 function openNwsWithCurrentLocation() {
-  console.log("Open with safari?");
-  if (navigator.geolocation) {
-    console.log("Navigator enabled!");
-    navigator.geolocation.getCurrentPosition(openCurrentLoc, geoError);
-  } else {
-    console.log("Geo-location not supported");
-  }
+    console.log("Open with safari?");
+    if (navigator.geolocation) {
+        console.log("Navigator enabled!");
+        navigator.geolocation.getCurrentPosition(openCurrentLoc, geoError);
+    } else {
+        console.log("Geo-location not supported");
+    }
 }
 
 function geoError(err) {
-  console.log("Error with getCurrentPosition", err);
+    console.log("Error with getCurrentPosition", err);
 }
 
 /**
@@ -140,93 +140,95 @@ function geoError(err) {
  * @param {Object} data Weather forecast data to update the element with.
  */
 function renderForecast(card, data) {
-  if (!data) {
-    // There's no data, skip the update.
-    return;
-  }
+    console.log('Card', card);
+    console.log('Data', document.getElementById('44.038463,-92.425963'));
+    console.log("Forecast Data", data);
 
-  // Find out when the element was last updated.
-  const cardLastUpdatedElem = card.querySelector(".card-last-updated");
-  const cardLastUpdated = cardLastUpdatedElem.textContent;
-  const lastUpdated = parseInt(cardLastUpdated);
+    // calculate the daylight hours
+    const sunRise = data.currently?.sunrise;
+    const sunRiseLabel = formatTime(sunRise, data.timezone);
+    const sunSet = data.currently?.sunset;
+    const sunSetLabel = formatTime(sunSet, data.timezone);
+    const dayLightHours = (sunSet - sunRise) / 3600;
+    console.log("Daylight Hours", dayLightHours);
+    if (!data) {
+        // There's no data, skip the update.
+        return;
+    }
 
-  // If the data on the element is newer, skip the update.
-  // if (lastUpdated >= data.currently.time) {
-  //   return;
-  // }
-  cardLastUpdatedElem.textContent = data.currently.time;
+    // Elevation
+    if (data.elevation) {
+        card.querySelector(".elevation").textContent = `${Math.round(data.elevation)}f elevation`;
+    }
 
-  // Render the forecast data into the card.
-  card.querySelector(".description").textContent = data.currently.summary;
-  const forecastFrom = luxon.DateTime.fromSeconds(data.currently.time)
-    .setZone(data.timezone)
-    .toFormat("DDDD t");
-  card.querySelector(".date").textContent = forecastFrom;
+    card.querySelector(".city-timezone-label").textContent = data.timezone;
+    card.querySelector(".temp-current").textContent = data.currently.temperature;
+    card.querySelector(".summary").textContent = data.currently.icon + ' ' + data.currently.summary;
+    card.querySelector(".wind-speed").textContent = data.currently.windSpeed;
+    card.querySelector(".wind-bearing").textContent = data.currently.windBearing;
+    card.querySelector(".wind-chill").textContent = data.currently.windChill;
+    card.querySelector(".feels-like").textContent = data.currently.feelsLike;
+    card.querySelector(".avalanche-risk").textContent = '⚠️ Avalanche Risk: ' + data.currently.avalancheRisk.toUpperCase();
+    card.querySelector(".avalanche-risk").classList.add(getAvalancheRiskClass(data.currently.avalancheRisk));
 
-  // Elevation
-  if (data.elevation) {
-    card.querySelector(".elevation").textContent = `${Math.round(data.elevation)} F`;
-  }
+    card.querySelector(".current-time").textContent = formatUpdateTime(data.currently.time);
+    card.querySelector(".snow-depth").textContent = data.currently.snowDepth + '"';
+    card.querySelector(".precipitation-probablity").textContent = data.currently.precipitationProbability + '%';
+    card.querySelector(".humidity").textContent = data.currently.humidity + '%';
 
-  card.querySelector(
-    ".current .icon"
-  ).className = `icon ${data.currently.icon}`;
-  card.querySelector(".current .temperature .value").textContent = Math.round(
-    data.currently.temperature
-  );
+    card.querySelector(".daylight").textContent = sunRiseLabel + ' - ' + sunSetLabel;
+    card.querySelector(".snow-fall").textContent = data.currently.snowFall + '"';
+    card.querySelector(".precipitation-amount").textContent = data.currently.precipitation + '"';
+    // If the loading spinner is still visible, remove it.
+    const spinner = card.querySelector(".card-spinner");
+    if (spinner) {
+        card.removeChild(spinner);
+    }
+}
 
-  // Current Snow Fall
-  card.querySelector(".current .visual .snow-fall .value").textContent = data.currently.snowFall || 0;
+function formatUpdateTime(msTime) {
+    const date = new Date(msTime);
 
-  card.querySelector(".current .humidity .value").textContent = Math.round(
-    data.currently.humidity * 100
-  );
-  card.querySelector(".current .wind .value").textContent = Math.round(
-    data.currently.windSpeed
-  );
-  card.querySelector(".current .wind .direction").textContent =
-    data.currently.windBearing;
+    // Month abbreviations
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-  // Current Snow Depth (convert feet to inches)
-  const snowDepthInches = (data.currently.snowDepth || 0) * 12;
-  card.querySelector(".current .snow-depth .value").textContent = Math.round(snowDepthInches * 10) / 10;
+    const month = months[date.getMonth()];
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
 
-  const sunrise = luxon.DateTime.fromSeconds(data.daily.data[0].sunriseTime)
-    .setZone(data.timezone)
-    .toFormat("t");
-  card.querySelector(".current .sunrise .value").textContent = sunrise;
-  const sunset = luxon.DateTime.fromSeconds(data.daily.data[0].sunsetTime)
-    .setZone(data.timezone)
-    .toFormat("t");
-  card.querySelector(".current .sunset .value").textContent = sunset;
+    return `${month} ${day}, ${hours}:${minutes}`;
+}
+/**
+ * Formats a timestamp into a human-readable time string.
+ *
+ * @param {number} timestamp - The timestamp to format - converted to ms on server
+ * @param {string} timezone - The timezone to use for formatting.
+ * @returns {string} The formatted time string.
+ */
+function formatTime(timestamp, timezone) {
+    return new Intl.DateTimeFormat("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
+        timeZone: timezone,
+    }).format(new Date(timestamp));
+}
 
-  // Render the next 7 days.
-  const futureTiles = card.querySelectorAll(".future .oneday");
-  futureTiles.forEach((tile, index) => {
-    const forecast = data.daily.data[index + 1];
-    const forecastFor = luxon.DateTime.fromSeconds(forecast.time)
-      .setZone(data.timezone)
-      .toFormat("ccc");
-    tile.querySelector(".date").textContent = forecastFor;
-
-    // Future Precip Prob and Snow Fall
-    tile.querySelector(".precip-prob .value").textContent = forecast.precipitationProbability || 0;
-    tile.querySelector(".snow-fall .value").textContent = forecast.snowFall || 0;
-
-    tile.querySelector(".icon").className = `icon ${forecast.icon}`;
-    tile.querySelector(".temp-high .value").textContent = Math.round(
-      forecast.temperatureHigh
-    );
-    tile.querySelector(".temp-low .value").textContent = Math.round(
-      forecast.temperatureLow
-    );
-  });
-
-  // If the loading spinner is still visible, remove it.
-  const spinner = card.querySelector(".card-spinner");
-  if (spinner) {
-    card.removeChild(spinner);
-  }
+function getAvalancheRiskClass(risk) {
+    switch (risk) {
+        case 'low':
+            return 'avalanche-risk-low';
+        case 'moderate':
+            return 'avalanche-risk-moderate';
+        case 'high':
+            return 'avalanche-risk-high';
+        case 'very high':
+            return 'avalanche-risk-very-high';
+        default:
+            return 'avalanche-risk-unknown';
+    }
 }
 
 /**
@@ -236,13 +238,13 @@ function renderForecast(card, data) {
  * @return {Object} The weather forecast, if the request fails, return null.
  */
 function getForecastFromNetwork(coords) {
-  return fetch(`/forecast/${coords}`)
-    .then(response => {
-      return response.json();
-    })
-    .catch(() => {
-      return null;
-    });
+    return fetch(`/forecast/${coords}`)
+        .then(response => {
+            return response.json();
+        })
+        .catch(() => {
+            return null;
+        });
 }
 
 /**
@@ -252,22 +254,22 @@ function getForecastFromNetwork(coords) {
  * @return {Object} The weather forecast, if the request fails, return null.
  */
 function getForecastFromCache(coords) {
-  // CODELAB: Add code to get weather forecast from the caches object.
-  if (!('caches' in window)) {
-    return null;
-  }
-  const url = `${window.location.origin}/forecast/${coords}`;
-  return caches.match(url)
-    .then((response) => {
-      if (response) {
-        return response.json();
-      }
-      return null;
-    })
-    .catch((err) => {
-      console.error('Error getting data from cache', err);
-      return null;
-    });
+    // CODELAB: Add code to get weather forecast from the caches object.
+    if (!('caches' in window)) {
+        return null;
+    }
+    const url = `${window.location.origin}/forecast/${coords}`;
+    return caches.match(url)
+        .then((response) => {
+            if (response) {
+                return response.json();
+            }
+            return null;
+        })
+        .catch((err) => {
+            console.error('Error getting data from cache', err);
+            return null;
+        });
 }
 
 /**
@@ -278,22 +280,25 @@ function getForecastFromCache(coords) {
  * @return {Element} The element for the weather forecast.
  */
 function getForecastCard(location) {
-  const id = location.geo;
-  const card = document.getElementById(id);
-  if (card) {
-    return card;
-  }
-  const newCard = document.getElementById("weather-template").cloneNode(true);
-  newCard.querySelector(".location").textContent = location.label;
-  newCard.setAttribute("id", id);
-  newCard
-    .querySelector(".remove-city")
-    .addEventListener("click", removeLocation);
-  // add listener to open weather.gov
-  newCard.querySelector(".open-nws").addEventListener("click", openNws);
-  document.querySelector("main").appendChild(newCard);
-  newCard.removeAttribute("hidden");
-  return newCard;
+    console.log('getForecastCard', location);
+    const id = location.geo;
+    const card = document.getElementById(id);
+    if (card) {
+        return card;
+    }
+    const newCard = document.getElementById("city-card-template").content.cloneNode(true);
+    // debugger;
+    newCard.querySelector(".city-label").textContent = location.label;
+    newCard.querySelector(".city-card").setAttribute("id", id);
+    // newCard
+    //    .querySelector(".remove-city")
+    //    .addEventListener("click", removeLocation);
+    // add listener to open weather.gov
+    // newCard.querySelector("#city-label").addEventListener("click", openNws);
+    document.querySelector(".city-container").appendChild(newCard);
+    console.log('What is this new card?', newCard);
+    let theNewCard = document.getElementById(id);
+    return theNewCard;
 }
 
 /**
@@ -301,19 +306,20 @@ function getForecastCard(location) {
  * new data.
  */
 function updateData() {
-  Object.keys(weatherApp.selectedLocations).forEach(key => {
-    const location = weatherApp.selectedLocations[key];
-    const card = getForecastCard(location);
-    // CODELAB: Add code to call getForecastFromCache
-    getForecastFromCache(location.geo)
-      .then((forecast) => {
-        renderForecast(card, forecast);
-      });
-    // Get the forecast data from the network.
-    getForecastFromNetwork(location.geo).then(forecast => {
-      renderForecast(card, forecast);
+    console.log('updateData');
+    Object.keys(weatherApp.selectedLocations).forEach(key => {
+        const location = weatherApp.selectedLocations[key];
+        const card = getForecastCard(location);
+        // CODELAB: Add code to call getForecastFromCache
+        getForecastFromCache(location.geo)
+            .then((forecast) => {
+                renderForecast(card, forecast);
+            });
+        // Get the forecast data from the network.
+        getForecastFromNetwork(location.geo).then(forecast => {
+            renderForecast(card, forecast);
+        });
     });
-  });
 }
 
 /**
@@ -322,8 +328,8 @@ function updateData() {
  * @param {Object} locations The list of locations to save.
  */
 function saveLocationList(locations) {
-  const data = JSON.stringify(locations);
-  localStorage.setItem("locationList", data);
+    const data = JSON.stringify(locations);
+    localStorage.setItem("locationList", data);
 }
 
 /**
@@ -332,20 +338,20 @@ function saveLocationList(locations) {
  * @return {Array}
  */
 function loadLocationList() {
-  let locations = localStorage.getItem("locationList");
-  if (locations) {
-    try {
-      locations = JSON.parse(locations);
-    } catch (ex) {
-      locations = {};
+    let locations = localStorage.getItem("locationList");
+    if (locations) {
+        try {
+            locations = JSON.parse(locations);
+        } catch (ex) {
+            locations = {};
+        }
     }
-  }
-  if (!locations || Object.keys(locations).length === 0) {
-    const key = "43.638011,-92.449644";
-    locations = {};
-    locations[key] = { label: "Hanson House", geo: "43.638011,-92.449644" };
-  }
-  return locations;
+    if (!locations || Object.keys(locations).length === 0) {
+        const key = "44.038463,-92.425963";
+        locations = {};
+        locations[key] = { label: "Hanson House", geo: "44.038463,-92.425963" };
+    }
+    return locations;
 }
 
 /**
@@ -354,22 +360,11 @@ function loadLocationList() {
  * renders the initial data.
  */
 function init() {
-  // Get the location list, and update the UI.
-  weatherApp.selectedLocations = loadLocationList();
-  updateData();
+    console.log('init');
+    // Get the location list, and update the UI.
+    weatherApp.selectedLocations = loadLocationList();
+    updateData();
 
-  // Set up the event handlers for all of the buttons.
-  document.getElementById("butRefresh").addEventListener("click", updateData);
-  document.getElementById("butAdd").addEventListener("click", toggleAddDialog);
-  document
-    .getElementById("butDialogCancel")
-    .addEventListener("click", toggleAddDialog);
-  document
-    .getElementById("butDialogAdd")
-    .addEventListener("click", addLocation);
-  document
-    .getElementById("getCurrentLocation")
-    .addEventListener("click", openNwsWithCurrentLocation);
 }
 
 init();

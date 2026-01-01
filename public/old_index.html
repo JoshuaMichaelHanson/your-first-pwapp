@@ -1,0 +1,314 @@
+<!--
+ Your First PWA Codelab (https://g.co/codelabs/pwa)
+
+ Copyright 2019 Google Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Josh Hanson Weather</title>
+  <link rel="stylesheet" type="text/css" href="/styles/inline.css">
+  <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+
+  <!-- CODELAB: Add link rel manifest -->
+  <link rel="manifest" href="/manifest.json">
+  <!-- CODELAB: Add iOS meta tags and icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Weather PWA">
+  <link rel="apple-touch-icon" href="/images/icons/icon-152x152.png">
+  <!-- CODELAB: Add description here -->
+  <meta name="Josh Hanson" content="Sweet Weather Application">
+  <meta name="description" content="A sweet weather app">
+  <!-- CODELAB: Add meta theme-color -->
+  <meta name="theme-color" content="#2F3BA2">
+</head>
+
+<body>
+
+  <header class="header">
+    <h1>
+      Hanson Family Weather
+      <a href="https://open-meteo.com/">
+        Weather data by Open-Meteo.com
+      </a>
+    </h1>
+    <button id="butInstall" aria-label="Install" hidden></button>
+    <button id="butRefresh" aria-label="Refresh"></button>
+  </header>
+
+  <main class="main">
+
+    <button id="butAdd" class="fab" aria-label="Add">
+      <span class="icon add"></span>
+    </button>
+
+    <button id="getCurrentLocation" class="loc" aria-label="NWS Point Forcast">
+      <span class="icon locate"></span>
+    </button>
+
+    <div id="weather-template" class="weather-card" hidden>
+      <div class="card-spinner">
+        <svg viewBox="0 0 32 32" width="32" height="32">
+          <circle cx="16" cy="16" r="14" fill="none"></circle>
+        </svg>
+      </div>
+      <button class="remove-city">&times;</button>
+      <div class="city-key" hidden></div>
+      <div class="card-last-updated" hidden></div>
+      <div class="location-row">
+        <div class="location open-nws">&nbsp;</div>
+        <div class="elevation"></div>
+      </div>
+      <div class="date">&nbsp;</div>
+      <div class="description">&nbsp;</div>
+      <div class="current">
+        <div class="visual">
+          <div class="icon"></div>
+          <div class="current-temp-wrapper">
+            <div class="temperature">
+              <span class="value"></span><span class="scale">°F</span>
+            </div>
+            <div class="snow-fall">
+              <span class="value"></span><span class="scale">"</span>
+            </div>
+          </div>
+        </div>
+        <div class="description">
+          <div class="humidity">
+            <span class="label">Humidity:</span>
+            <span class="value"></span><span class="scale">%</span>
+          </div>
+          <div class="wind">
+            <span class="label">Wind:</span>
+            <span class="value"></span>
+            <span class="scale">mph</span>
+            <span class="direction"></span>°
+          </div>
+          <div class="snow-depth">
+            <span class="label">Depth:</span>
+            <span class="value"></span><span class="scale">"</span>
+          </div>
+          <div class="sunrise">
+            <span class="label">Sunrise:</span>
+            <span class="value"></span>
+          </div>
+          <div class="sunset">
+            <span class="label">Sunset:</span>
+            <span class="value"></span>
+          </div>
+        </div>
+      </div>
+      <div class="future">
+        <div class="oneday">
+          <div class="date"></div>
+          <div class="future-precip-wrapper">
+            <div class="precip-prob">
+              <span class="value"></span>%
+            </div>
+            <div class="snow-fall">
+              <span class="value"></span>"
+            </div>
+          </div>
+          <div class="icon"></div>
+          <div class="future-temp-wrapper">
+            <div class="temp-high">
+              <span class="value"></span>°
+            </div>
+            <div class="temp-low">
+              <span class="value"></span>°
+            </div>
+          </div>
+        </div>
+        <div class="oneday">
+          <div class="date"></div>
+          <div class="future-precip-wrapper">
+            <div class="precip-prob">
+              <span class="value"></span>%
+            </div>
+            <div class="snow-fall">
+              <span class="value"></span>"
+            </div>
+          </div>
+          <div class="icon"></div>
+          <div class="future-temp-wrapper">
+            <div class="temp-high">
+              <span class="value"></span>°
+            </div>
+            <div class="temp-low">
+              <span class="value"></span>°
+            </div>
+          </div>
+        </div>
+        <div class="oneday">
+          <div class="date"></div>
+          <div class="future-precip-wrapper">
+            <div class="precip-prob">
+              <span class="value"></span>%
+            </div>
+            <div class="snow-fall">
+              <span class="value"></span>"
+            </div>
+          </div>
+          <div class="icon"></div>
+          <div class="future-temp-wrapper">
+            <div class="temp-high">
+              <span class="value"></span>°
+            </div>
+            <div class="temp-low">
+              <span class="value"></span>°
+            </div>
+          </div>
+        </div>
+        <div class="oneday">
+          <div class="date"></div>
+          <div class="future-precip-wrapper">
+            <div class="precip-prob">
+              <span class="value"></span>%
+            </div>
+            <div class="snow-fall">
+              <span class="value"></span>"
+            </div>
+          </div>
+          <div class="icon"></div>
+          <div class="future-temp-wrapper">
+            <div class="temp-high">
+              <span class="value"></span>°
+            </div>
+            <div class="temp-low">
+              <span class="value"></span>°
+            </div>
+          </div>
+        </div>
+        <div class="oneday">
+          <div class="date"></div>
+          <div class="future-precip-wrapper">
+            <div class="precip-prob">
+              <span class="value"></span>%
+            </div>
+            <div class="snow-fall">
+              <span class="value"></span>"
+            </div>
+          </div>
+          <div class="icon"></div>
+          <div class="future-temp-wrapper">
+            <div class="temp-high">
+              <span class="value"></span>°
+            </div>
+            <div class="temp-low">
+              <span class="value"></span>°
+            </div>
+          </div>
+        </div>
+        <div class="oneday">
+          <div class="date"></div>
+          <div class="future-precip-wrapper">
+            <div class="precip-prob">
+              <span class="value"></span>%
+            </div>
+            <div class="snow-fall">
+              <span class="value"></span>"
+            </div>
+          </div>
+          <div class="icon"></div>
+          <div class="future-temp-wrapper">
+            <div class="temp-high">
+              <span class="value"></span>°
+            </div>
+            <div class="temp-low">
+              <span class="value"></span>°
+            </div>
+          </div>
+        </div>
+        <div class="oneday">
+          <div class="date"></div>
+          <div class="future-precip-wrapper">
+            <div class="precip-prob">
+              <span class="value"></span>%
+            </div>
+            <div class="snow-fall">
+              <span class="value"></span>"
+            </div>
+          </div>
+          <div class="icon"></div>
+          <div class="future-temp-wrapper">
+            <div class="temp-high">
+              <span class="value"></span>°
+            </div>
+            <div class="temp-low">
+              <span class="value"></span>°
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="addDialogContainer">
+    <div class="dialog">
+      <div class="dialog-title">Add <b>'Current Location'</b> <br /> or choose an existing one</div>
+      <div class="dialog-body">
+        <div class="input-div">
+          <input type="text" id="newLocationName" placeholder="Location Name" />
+        </div>
+        <select id="selectCityToAdd" aria-label="City to add">
+          <!--
+            Values are lat/lon values, use Google Maps to find and add
+            additional cities.
+          -->
+          <option value="current">Current Location</option>
+          <option value="43.997344,-92.449644">Hanson House</option>
+          <option value="44.557866,-92.725083">Mad JAXX</option>
+          <option value="45.638011,-95.466529">Cabin</option>
+          <option value="47.375865,-122.223539">Grandma in Kent</option>
+          <option value="46.935723,-121.474018">Chrystal Mt. Base</option>
+          <option value="46.936157,-121.474018">Chrystal Mt. Summit</option>
+          <option value="37.757815,-122.5076401">San Francisco, USA</option>
+          <option value="31.2243085,120.9162955">Shanghai, China</option>
+          <option value="35.6735408,139.5703032">Tokyo, Japan</option>
+        </select>
+      </div>
+      <div class="dialog-buttons">
+        <button id="butDialogCancel" class="button">Cancel</button>
+        <button id="butDialogAdd" class="button">Add</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- CODELAB: Add the install script here -->
+  <script src="/scripts/install.js"></script>
+  <script>
+    // CODELAB: Register service worker.
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then((reg) => {
+            console.log('Service worker registered.', reg);
+          });
+      });
+    }
+  </script>
+
+</body>
+
+</html>
