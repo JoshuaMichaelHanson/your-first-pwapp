@@ -146,6 +146,54 @@ main {
 
 /* **************************************************** */
 
+/* Forecast info styles */
+.forecast-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    /* margin-top: 1rem; */
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+}
+
+.forecast-day {
+    flex: 1 1 calc(33.333% - 0.5rem);
+    min-width: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: var(--winter-snow);
+    border-radius: var(--radius-sm);
+    text-align: center;
+}
+
+.forecast-date {
+    font-weight: 600;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+}
+
+.forecast-high-low {
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.forecast-snow {
+    font-size: 0.7rem;
+    color: var(--winter-blue);
+}
+
+.forecast-precip {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+}
+
+.forecast-icon {
+    font-size: 1.2rem;
+}
+
 /* Media queries come last */
 .container,
 .container-fluid,

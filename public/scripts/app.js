@@ -140,6 +140,11 @@ function geoError(err) {
  * @param {Object} data Weather forecast data to update the element with.
  */
 function renderForecast(card, data) {
+    if (!data) {
+        // There's no data, skip the update.
+        return;
+    }
+
     console.log('Card', card);
     console.log('Data', document.getElementById('44.038463,-92.425963'));
     console.log("Forecast Data", data);
@@ -151,10 +156,6 @@ function renderForecast(card, data) {
     const sunSetLabel = formatTime(sunSet, data.timezone);
     const dayLightHours = (sunSet - sunRise) / 3600;
     console.log("Daylight Hours", dayLightHours);
-    if (!data) {
-        // There's no data, skip the update.
-        return;
-    }
 
     // Elevation
     if (data.elevation) {
@@ -179,6 +180,27 @@ function renderForecast(card, data) {
     card.querySelector(".daylight").textContent = sunRiseLabel + ' - ' + sunSetLabel;
     card.querySelector(".snow-fall").textContent = data.currently.snowFall + '"';
     card.querySelector(".precipitation-amount").textContent = data.currently.precipitation + '"';
+
+    // Render forecast days
+    const forecastContainer = card.querySelector(".forecast-info");
+    forecastContainer.innerHTML = ""; // Clear existing
+    if (data.daily && data.daily.data) {
+        // skip the first 3 days, they are past and today's forecast
+        const futureDays = data.daily.data.slice(3);
+        futureDays.forEach((day) => {
+            const dayElement = document.createElement("div");
+            dayElement.classList.add("forecast-day");
+            dayElement.innerHTML = `
+                <div class="forecast-date">${day.timeLabel}</div>
+                <div class="forecast-high-low">${day.temperatureHigh}° / ${day.temperatureLow}°</div>
+                <div class="forecast-snow">❄️ ${day.snowFall}"</div>
+                <div class="forecast-precip">${day.precipitationProbability}%</div>
+                <div class="forecast-icon">${day.icon}</div>
+            `;
+            forecastContainer.appendChild(dayElement);
+        });
+    }
+
     // If the loading spinner is still visible, remove it.
     const spinner = card.querySelector(".card-spinner");
     if (spinner) {
