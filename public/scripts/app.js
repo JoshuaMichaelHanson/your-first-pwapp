@@ -22,6 +22,19 @@ const weatherApp = {
     addDialogContainer: document.getElementById("addDialogContainer")
 };
 
+function createIconImg(src, altText) {
+    if (!src) {
+        return null;
+    }
+    const img = document.createElement("img");
+    img.classList.add("icon-svg");
+    img.src = src;
+    img.alt = altText || "";
+    img.decoding = "async";
+    img.loading = "lazy";
+    return img;
+}
+
 /**
  * Toggles the visibility of the add location dialog box.
  */
@@ -192,13 +205,30 @@ function renderForecast(card, data) {
 
     card.querySelector(".city-timezone-label").textContent = data.timezone;
     card.querySelector(".temp-current").textContent = data.currently.temperature;
-    card.querySelector(".summary").textContent = data.currently.icon + ' ' + data.currently.summary;
+    const summaryIcon = card.querySelector(".summary-icon");
+    summaryIcon.innerHTML = "";
+    const summaryImg = createIconImg(data.currently.icon, data.currently.summary);
+    if (summaryImg) {
+        summaryIcon.appendChild(summaryImg);
+    }
+    card.querySelector(".summary").textContent = data.currently.summary;
     card.querySelector(".wind-speed").textContent = data.currently.windSpeed;
     card.querySelector(".wind-bearing").textContent = data.currently.windBearing;
     card.querySelector(".wind-chill").textContent = data.currently.windChill;
     card.querySelector(".feels-like").textContent = data.currently.feelsLike;
-    card.querySelector(".avalanche-risk").textContent = '⚠️ Avalanche Risk: ' + data.currently.avalancheRisk.toUpperCase();
-    card.querySelector(".avalanche-risk").classList.add(getAvalancheRiskClass(data.currently.avalancheRisk));
+    const avalancheRisk = card.querySelector(".avalanche-risk");
+    avalancheRisk.textContent = "";
+    const avalancheImg = createIconImg(
+        data.currently.avalancheIcon,
+        `Avalanche risk ${data.currently.avalancheRisk}`
+    );
+    if (avalancheImg) {
+        avalancheRisk.appendChild(avalancheImg);
+    }
+    avalancheRisk.appendChild(
+        document.createTextNode(`Avalanche Risk: ${data.currently.avalancheRisk.toUpperCase()}`)
+    );
+    avalancheRisk.classList.add(getAvalancheRiskClass(data.currently.avalancheRisk));
 
     card.querySelector(".current-time").textContent = formatUpdateTime(data.currently.time);
     card.querySelector(".snow-depth").textContent = data.currently.snowDepth + '"';
@@ -221,10 +251,23 @@ function renderForecast(card, data) {
             dayElement.innerHTML = `
                 <div class="forecast-date">${day.timeLabel}</div>
                 <div class="forecast-high-low">${day.temperatureHigh}° / ${day.temperatureLow}°</div>
-                <div class="forecast-snow">❄️ ${day.snowFall}"</div>
+                <div class="forecast-snow">
+                    <span class="forecast-snow-icon"></span>
+                    <span class="forecast-snow-value">${day.snowFall}"</span>
+                </div>
                 <div class="forecast-precip">${day.precipitationProbability}%</div>
-                <div class="forecast-icon">${day.icon}</div>
+                <div class="forecast-icon"></div>
             `;
+            const forecastIcon = dayElement.querySelector(".forecast-icon");
+            const forecastImg = createIconImg(day.icon, `${day.timeLabel} forecast`);
+            if (forecastImg) {
+                forecastIcon.appendChild(forecastImg);
+            }
+            const snowIcon = dayElement.querySelector(".forecast-snow-icon");
+            const snowImg = createIconImg("/images/meteocons/fill/svg/snowflake.svg", "Snowfall");
+            if (snowImg) {
+                snowIcon.appendChild(snowImg);
+            }
             forecastContainer.appendChild(dayElement);
         });
     }

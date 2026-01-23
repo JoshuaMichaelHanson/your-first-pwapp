@@ -72,6 +72,36 @@ main {
     margin-bottom: 1.5rem;
 }
 
+.summary-info {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.summary-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.elevation-with-icon-info {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.elevation-icon {
+    width: 1.35em;
+    height: 1.35em;
+}
+
+.avalanche-risk .icon-svg {
+    width: 1.1em;
+    height: 1.1em;
+}
+
 
 .avalanche-risk-low {
     background: rgba(0, 148, 64, 0.1);
@@ -191,7 +221,32 @@ main {
 }
 
 .forecast-icon {
-    font-size: 1.2rem;
+    font-size: 1.6rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.forecast-snow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+}
+
+.forecast-snow-icon {
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.icon-svg {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    object-fit: contain;
 }
 
 /* Media queries come last */

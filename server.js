@@ -189,7 +189,7 @@ const weatherSummaries = {
   71: "Slight snow",
   73: "Moderate snow",
   75: "Heavy snow",
-  77: "Snow geoins",
+  77: "Snow grains",
   80: "Rain showers (slight)",
   81: "Rain showers (moderate)",
   82: "Rain showers (violent)",
@@ -200,37 +200,56 @@ const weatherSummaries = {
   99: "Thunderstorm with heavy hail",
 };
 
+const iconBasePath = "/images/meteocons/fill/svg";
+
 const weatherIcons = {
-  "clear-day": "☀️",
-  "clear-night": "🌙",
-  "partly-cloudy-day": "⛅",
-  "partly-cloudy-night": "☁️",
-  fog: "🌫️",
-  rain: "🌧️",
-  snow: "❄️",
+  "clear-day": `${iconBasePath}/clear-day.svg`,
+  "clear-night": `${iconBasePath}/clear-night.svg`,
+  "partly-cloudy-day": `${iconBasePath}/extreme-day.svg`,
+  "partly-cloudy-night": `${iconBasePath}/extreme-night.svg`,
+  "overcast-day": `${iconBasePath}/extreme-day.svg`,
+  "overcast-night": `${iconBasePath}/extreme-night.svg`,
+  overcast: `${iconBasePath}/extreme.svg`,
+  "fog-day": `${iconBasePath}/extreme-day-fog.svg`,
+  "fog-night": `${iconBasePath}/extreme-night-fog.svg`,
+  fog: `${iconBasePath}/extreme-fog.svg`,
+  "drizzle-day": `${iconBasePath}/extreme-day-drizzle.svg`,
+  "drizzle-night": `${iconBasePath}/extreme-night-drizzle.svg`,
+  drizzle: `${iconBasePath}/extreme-drizzle.svg`,
+  "rain-day": `${iconBasePath}/extreme-day-rain.svg`,
+  "rain-night": `${iconBasePath}/extreme-night-rain.svg`,
+  rain: `${iconBasePath}/extreme-rain.svg`,
+  "snow-day": `${iconBasePath}/extreme-day-snow.svg`,
+  "snow-night": `${iconBasePath}/extreme-night-snow.svg`,
+  snow: `${iconBasePath}/extreme-snow.svg`,
+  "thunderstorm-day": `${iconBasePath}/thunderstorms-day-extreme.svg`,
+  "thunderstorm-night": `${iconBasePath}/thunderstorms-night-extreme.svg`,
+  thunderstorm: `${iconBasePath}/thunderstorms-extreme.svg`,
 };
 
-const iconFallback = "🌤️";
+const iconFallback = `${iconBasePath}/not-available.svg`;
 
 const windIcons = {
-  "calm": "🌬️",
-  "light": "",
-  "moderate": "",
-  "strong": "",
-}
+  calm: `${iconBasePath}/wind-beaufort-0.svg`,
+  light: `${iconBasePath}/wind-beaufort-2.svg`,
+  moderate: `${iconBasePath}/wind-beaufort-5.svg`,
+  strong: `${iconBasePath}/wind-beaufort-7.svg`,
+};
 
 const avalancheIcons = {
-  "low": "",
-  "moderate": "",
-  "high": "",
-}
+  low: `${iconBasePath}/code-green.svg`,
+  moderate: `${iconBasePath}/code-orange.svg`,
+  high: `${iconBasePath}/code-red.svg`,
+  "very high": `${iconBasePath}/alert-avalanche-danger.svg`,
+  unknown: iconFallback,
+};
 
 const ridingConditionsIcons = {
-  "ice": "",
-  "groomers": "",
-  "powder": "",
-  "epic powder": "",
-}
+  ice: `${iconBasePath}/thermometer-mercury-cold.svg`,
+  groomers: `${iconBasePath}/snowman.svg`,
+  powder: `${iconBasePath}/snowflake.svg`,
+  "epic powder": `${iconBasePath}/extreme-snow.svg`,
+};
 
 function degreesToCardinal(degrees) {
   const directions = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
@@ -240,11 +259,14 @@ function degreesToCardinal(degrees) {
 
 function mapWeatherCodeToIcon(code, isDay = true) {
   if (code === 0) return isDay ? "clear-day" : "clear-night";
-  if ([1, 2, 3].includes(code)) return isDay ? "partly-cloudy-day" : "partly-cloudy-night";
-  if ([45, 48].includes(code)) return "fog";
-  if ([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "rain";
-  if ([71, 73, 75, 77, 85, 86].includes(code)) return "snow";
-  if ([95, 96, 99].includes(code)) return "rain";
+  if (code === 1) return isDay ? "clear-day" : "clear-night";
+  if (code === 2) return isDay ? "partly-cloudy-day" : "partly-cloudy-night";
+  if (code === 3) return isDay ? "overcast-day" : "overcast-night";
+  if ([45, 48].includes(code)) return isDay ? "fog-day" : "fog-night";
+  if ([51, 53, 55, 56, 57].includes(code)) return isDay ? "drizzle-day" : "drizzle-night";
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return isDay ? "rain-day" : "rain-night";
+  if ([71, 73, 75, 77, 85, 86].includes(code)) return isDay ? "snow-day" : "snow-night";
+  if ([95, 96, 99].includes(code)) return isDay ? "thunderstorm-day" : "thunderstorm-night";
   return "clear-day";
 }
 
@@ -292,8 +314,12 @@ function formatUpdatedLabel(timestamp, timezone) {
   }).format(new Date(timestamp * 1000));
 }
 
-function getWeatherEmoji(iconName) {
+function getWeatherIcon(iconName) {
   return weatherIcons[iconName] ?? iconFallback;
+}
+
+function getAvalancheIcon(risk) {
+  return avalancheIcons[risk] ?? iconFallback;
 }
 
 function getWeatherSummary(code) {
@@ -307,7 +333,7 @@ function buildDailyForecast(daily, timezone) {
       label: formatDateLabel(day.time, timezone),
       high: Math.round(day.temperature_2m_max),
       low: Math.round(day.temperature_2m_min),
-      icon: getWeatherEmoji(iconKey),
+      icon: getWeatherIcon(iconKey),
       snowfall: day.snowfall_sum ? day.snowfall_sum.toFixed(3) : "0",
       precipProb: day.precipitation_probability_max || 0,
     };
@@ -407,7 +433,7 @@ async function getForecast(req, resp) {
       currently: {
         time: current.time * 1000, // switch to js time ms
         summary: getWeatherSummary(current.weather_code),
-        icon: getWeatherEmoji(iconKey),
+        icon: getWeatherIcon(iconKey),
         temperature: Math.round(current.temperature_2m),
         feelsLike: Math.round(current.apparent_temperature),
         humidity: current.relative_humidity_2m,
@@ -419,6 +445,7 @@ async function getForecast(req, resp) {
         windBearing: windDirLabel,
         windChill: windChill,
         avalancheRisk: avalancheRisk,
+        avalancheIcon: getAvalancheIcon(avalancheRisk),
         sunrise: data.daily?.sunrise?.[2] * 1000, // we went 2 days back to get recent snow-fall
         sunset: data.daily?.sunset?.[2] * 1000,
       },
@@ -426,7 +453,7 @@ async function getForecast(req, resp) {
         data: daily.time.map((time, index) => ({
           time: time * 1000,
           timeLabel: formatDateLabel(time, data.timezone),
-          icon: getWeatherEmoji(mapWeatherCodeToIcon(daily.weather_code[index])),
+          icon: getWeatherIcon(mapWeatherCodeToIcon(daily.weather_code[index])),
           sunriseTime: daily.sunrise[index] * 1000,
           sunsetTime: daily.sunset[index] * 1000,
           temperatureHigh: Math.round(daily.temperature_2m_max[index]),
