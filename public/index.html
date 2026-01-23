@@ -29,10 +29,19 @@
         </header>
         <main>
             <!-- Add floating buttons here -->
+            <div class="fab-container">
+                <button id="butAdd" class="fab" aria-label="Add from list">
+                    <img src="./images/add.svg" alt="Add from list">
+                </button>
+                <button id="butAddCurrent" class="fab" aria-label="Add current location">
+                    <img src="./images/locate.svg" alt="Add current location">
+                </button>
+            </div>
             <div class="city-container container">
-                <!-- City Cards are injected here -->
+                     <!-- City Cards are injected here -->
                 <template id="city-card-template">
                     <article class="city-card">
+                        <button class="remove-city" aria-label="Remove">&times;</button>
                         <div class="card-spinner">
                             <svg viewBox="0 0 32 32" width="32" height="32">
                                 <circle cx="16" cy="16" r="14" fill="none"></circle>
@@ -105,6 +114,76 @@
     <script>
         console.log('index.html loaded');
     </script>
+    <div id="addDialogContainer">
+        <div class="dialog">
+            <div class="dialog-title">Add New Resort</div>
+            <div class="dialog-body">
+                <div class="input-div" id="locationNameInputDiv" style="display: none;">
+                    <label for="newLocationName">Location Name</label>
+                    <input type="text" id="newLocationName" placeholder="Enter location name" />
+                </div>
+                <div id="resortSelectDiv">
+                    <label for="selectCityToAdd">Choose a Resort</label>
+                    <select id="selectCityToAdd" aria-label="Resort to add">
+                        <option value="" disabled selected>Select a resort</option>
+                        <optgroup label="Major USA/Canada">
+                            <option value="50.1163,-122.9574">Whistler Blackcomb, BC</option>
+                            <option value="39.6403,-106.3742">Vail, CO</option>
+                            <option value="39.2130,-106.9378">Aspen Snowmass, CO</option>
+                            <option value="40.6461,-111.4980">Park City, UT</option>
+                            <option value="43.5875,-110.8279">Jackson Hole, WY</option>
+                            <option value="51.1158,-115.7767">Banff Sunshine, AB</option>
+                            <option value="46.2132,-74.5804">Mont Tremblant, QC</option>
+                            <option value="40.4850,-106.8317">Steamboat, CO</option>
+                            <option value="37.6308,-119.0326">Mammoth Mountain, CA</option>
+                            <option value="39.4817,-106.0384">Breckenridge, CO</option>
+                        </optgroup>
+                        <optgroup label="Minnesota">
+                            <option value="47.6617,-90.7100">Lutsen Mountains</option>
+                            <option value="46.7119,-92.2044">Spirit Mountain</option>
+                            <option value="44.8727,-92.7883">Afton Alps</option>
+                            <option value="44.5578,-92.7251">Welch Village</option>
+                            <option value="44.7214,-93.2847">Buck Hill</option>
+                            <option value="45.4883,-92.7308">Wild Mountain</option>
+                            <option value="47.5458,-92.3025">Giants Ridge</option>
+                            <option value="44.1377,-94.0203">Mount Kato</option>
+                            <option value="44.3541,-92.0519">Coffee Mill</option>
+                            <option value="45.4191,-94.3314">Powder Ridge</option>
+                            <option value="47.5919,-94.8814">Buena Vista</option>
+                        </optgroup>
+                        <optgroup label="Wisconsin">
+                            <option value="44.9358,-89.6793">Granite Peak</option>
+                            <option value="43.4831,-89.4319">Cascade Mountain</option>
+                            <option value="43.4216,-89.6294">Devil's Head</option>
+                            <option value="42.5089,-88.1883">Wilmot Mountain</option>
+                            <option value="42.7411,-88.4239">Alpine Valley</option>
+                            <option value="43.0336,-89.7561">Tyrol Basin</option>
+                            <option value="43.3444,-88.2431">Little Switzerland</option>
+                            <option value="44.1364,-89.1725">Nordic Mountain</option>
+                            <option value="45.3850,-92.6514">Trollhaugen</option>
+                            <option value="46.4388,-90.3161">Whitecap Mountains</option>
+                        </optgroup>
+                        <optgroup label="Michigan">
+                            <option value="45.1639,-84.9303">Boyne Mountain</option>
+                            <option value="45.4678,-84.9317">Boyne Highlands</option>
+                            <option value="44.5194,-86.1361">Crystal Mountain</option>
+                            <option value="47.3875,-87.9792">Mount Bohemia</option>
+                            <option value="45.4697,-84.9044">Nub's Nob</option>
+                            <option value="44.9189,-86.0308">The Homestead</option>
+                            <option value="44.2508,-85.7333">Caberfae Peaks</option>
+                            <option value="44.9425,-85.1114">Schuss Mountain</option>
+                            <option value="45.8366,-88.0867">Pine Mountain</option>
+                            <option value="46.0375,-88.5833">Ski Brule</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+            <div class="dialog-buttons">
+                <button id="butDialogCancel" class="button">Cancel</button>
+                <button id="butDialogAdd" class="button">Add</button>
+            </div>
+        </div>
+    </div>
     <script src="./scripts/luxon-1.11.4.js"></script>
     <script src="./scripts/app.js"></script>
 </body>

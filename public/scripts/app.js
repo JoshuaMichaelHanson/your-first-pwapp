@@ -29,29 +29,51 @@ function toggleAddDialog() {
     weatherApp.addDialogContainer.classList.toggle("visible");
 }
 
+function showAddResortDialog() {
+    document.getElementById("locationNameInputDiv").style.display = "none";
+    document.getElementById("resortSelectDiv").style.display = "block";
+    document.getElementById("selectCityToAdd").value = "";
+    document.querySelector(".dialog-title").textContent = "Add New Resort";
+    toggleAddDialog();
+}
+
+function showAddCurrentLocationDialog() {
+    document.getElementById("locationNameInputDiv").style.display = "block";
+    document.getElementById("resortSelectDiv").style.display = "none";
+    document.getElementById("newLocationName").value = "";
+    document.querySelector(".dialog-title").textContent = "Add Current Location";
+    toggleAddDialog();
+}
+
 /**
  * Event handler for butDialogAdd, adds the selected location to the list.
  */
 function addLocation() {
     // Hide the dialog
     toggleAddDialog();
-    // Get the selected city
-    const select = document.getElementById("selectCityToAdd");
-    const selected = select.options[select.selectedIndex];
-    const geo = selected.value;
-    const label = selected.textContent;
-    const location = { label: label, geo: geo };
-    console.log('GEO...', geo);
-    if (geo !== 'current') {
-        createCardAndUpdateSavedList(location);
-    } else {
-        console.log('Need to get the current geo');
+
+    const isCurrentLocation = document.getElementById("locationNameInputDiv").style.display === "block";
+
+    if (isCurrentLocation) {
         if (navigator.geolocation) {
-            console.log("Navigator enabled!");
             navigator.geolocation.getCurrentPosition(getCoordsInfo, geoError);
         } else {
             console.log("Geo-location not supported");
+            alert("Geo-location not supported by your browser");
         }
+    } else {
+        // Get the selected city
+        const select = document.getElementById("selectCityToAdd");
+        const selected = select.options[select.selectedIndex];
+        if (!selected || !selected.value) {
+            return;
+        }
+        const geo = selected.value;
+        const label = selected.textContent;
+
+        const location = { label: label, geo: geo };
+        console.log('Adding location from list:', location);
+        createCardAndUpdateSavedList(location);
     }
 }
 
@@ -69,7 +91,10 @@ function createCardAndUpdateSavedList(location) {
 function getCoordsInfo(position) {
     console.log('getCoordsInfo');
     const geo = position.coords.latitude + ',' + position.coords.longitude;
-    const label = document.getElementById("newLocationName").value;
+    let label = document.getElementById("newLocationName").value;
+    if (!label) {
+        label = "Current Location";
+    }
     const location = { label: label, geo: geo };
     createCardAndUpdateSavedList(location);
 }
@@ -80,21 +105,24 @@ function getCoordsInfo(position) {
  * @param {Event} evt
  */
 function removeLocation(evt) {
-    const parent = evt.srcElement.parentElement;
-    parent.remove();
-    if (weatherApp.selectedLocations[parent.id]) {
-        delete weatherApp.selectedLocations[parent.id];
-        saveLocationList(weatherApp.selectedLocations);
+    const card = evt.target.closest(".city-card");
+    if (card) {
+        const id = card.id;
+        card.remove();
+        if (weatherApp.selectedLocations[id]) {
+            delete weatherApp.selectedLocations[id];
+            saveLocationList(weatherApp.selectedLocations);
+        }
     }
 }
 
 function openNws(evt) {
     console.log('openNws', evt);
-    const parent = evt.srcElement.offsetParent;
-    console.log("Hi its me id=", parent.id);
+    const card = evt.target.closest(".city-card");
+    console.log("Hi its me id=", card.id);
     // window.open("https://www.w3schools.com");
     // need to split the lat and longitude
-    let coords = parent.id.split(",");
+    let coords = card.id.split(",");
     console.log("Coords ", coords);
     // https://forecast.weather.gov/MapClick.php?lat=44.0136&lon=-92.4757&unit=0&lg=english&FcstType=graphical
     const openUrl =
@@ -312,11 +340,11 @@ function getForecastCard(location) {
     // debugger;
     newCard.querySelector(".city-label").textContent = location.label;
     newCard.querySelector(".city-card").setAttribute("id", id);
-    // newCard
-    //    .querySelector(".remove-city")
-    //    .addEventListener("click", removeLocation);
+    newCard
+        .querySelector(".remove-city")
+        .addEventListener("click", removeLocation);
     // add listener to open weather.gov
-    // newCard.querySelector("#city-label").addEventListener("click", openNws);
+    newCard.querySelector(".city-label").addEventListener("click", openNws);
     document.querySelector(".city-container").appendChild(newCard);
     console.log('What is this new card?', newCard);
     let theNewCard = document.getElementById(id);
@@ -387,6 +415,11 @@ function init() {
     weatherApp.selectedLocations = loadLocationList();
     updateData();
 
+    // Add event listeners
+    document.getElementById("butAdd").addEventListener("click", showAddResortDialog);
+    document.getElementById("butAddCurrent").addEventListener("click", showAddCurrentLocationDialog);
+    document.getElementById("butDialogCancel").addEventListener("click", toggleAddDialog);
+    document.getElementById("butDialogAdd").addEventListener("click", addLocation);
 }
 
 init();
