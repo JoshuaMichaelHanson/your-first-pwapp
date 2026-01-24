@@ -32,7 +32,7 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--text);
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .app-shell {
@@ -50,6 +50,15 @@ header {
     z-index: 20;
 }
 
+header span {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+header a {
+    font-size: 0.6rem;
+}
+
 
 main {
     display: flex;
@@ -58,6 +67,12 @@ main {
 
 .city-container {
     /* need this later */
+}
+
+.city-label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
 }
 
 .city-card {
@@ -72,34 +87,248 @@ main {
     margin-bottom: 1.5rem;
 }
 
-.summary-info {
+.city-card-header-content {
+    display: grid;
+    grid-template-columns: 1.6fr 1.1fr 90px;
+    grid-template-areas:
+        "location location status"
+        "updated wind temp"
+        "elevation windchill temp"
+        "summary feels temp";
+    gap: 0.4rem 0.6rem;
+    align-items: start;
+}
+
+.city-resort-info {
+    grid-area: location;
+}
+
+.online-status-info {
+    grid-area: status;
+    justify-self: end;
+}
+
+.updated-info {
+    grid-area: updated;
     display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.elevation-with-icon-info {
+    grid-area: elevation;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.summary-info {
+    grid-area: summary;
+}
+
+.wind-info {
+    grid-area: wind;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.wind-icon {
+    font-size: 1.8rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+.wind-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+}
+
+.wind-chill-info {
+    grid-area: windchill;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.feels-like-info {
+    grid-area: feels;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.temp-info {
+    grid-area: temp;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+}
+
+.temp-value {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.2rem;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.temp-unit-icon {
+    width: 0.75em;
+    height: 0.75em;
+}
+
+.city-card-body-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem 0.8rem;
+}
+
+.info-label {
+    color: var(--text-tertiary);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.info-value {
+    color: var(--text);
+    font-weight: 600;
+}
+
+.summary {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.city-card-body-content .info-value {
+    font-size: 0.85rem;
+}
+
+.info-unit {
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+}
+
+.online-status-tag {
+    display: inline-flex;
     align-items: center;
     gap: 0.35rem;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: rgba(14, 165, 233, 0.12);
+    color: var(--winter-blue);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.summary-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
 }
 
 .summary-icon {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 2.4rem;
     line-height: 1;
 }
 
-.elevation-with-icon-info {
-    display: flex;
-    align-items: center;
-    gap: 0.35rem;
-}
-
-.elevation-icon {
-    width: 1.35em;
-    height: 1.35em;
+.summary-icon .icon-svg {
+    width: 2.6em;
+    height: 2.6em;
 }
 
 .avalanche-risk .icon-svg {
     width: 1.1em;
     height: 1.1em;
+}
+
+.riding-conditions-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.avalanche-risk,
+.riding-conditions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border-radius: 999px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+}
+
+.riding-conditions {
+    background: rgba(14, 116, 144, 0.12);
+    color: #0e7490;
+}
+
+.riding-condition-ice {
+    background: rgba(59, 130, 246, 0.12);
+    color: #2563eb;
+}
+
+.riding-condition-groomers {
+    background: rgba(16, 185, 129, 0.12);
+    color: #059669;
+}
+
+.riding-condition-powder {
+    background: rgba(56, 189, 248, 0.12);
+    color: #0284c7;
+}
+
+.riding-condition-epic-powder {
+    background: rgba(59, 130, 246, 0.12);
+    color: #1d4ed8;
+}
+
+.riding-conditions .icon-svg {
+    width: 1.1em;
+    height: 1.1em;
+}
+
+.remove-city {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(15, 23, 42, 0.05);
+    border: none;
+    border-radius: 999px;
+    padding: 0.35rem 0.6rem;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.remove-city:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: var(--avalanche-red);
+}
+
+.remove-city-label {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
 }
 
 
@@ -201,13 +430,13 @@ main {
 
 .forecast-date {
     font-weight: 600;
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: var(--text-secondary);
 }
 
 .forecast-high-low {
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
 .forecast-snow {
@@ -216,12 +445,12 @@ main {
 }
 
 .forecast-precip {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
     color: var(--text-tertiary);
 }
 
 .forecast-icon {
-    font-size: 1.6rem;
+    font-size: 1.9rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -235,7 +464,7 @@ main {
 }
 
 .forecast-snow-icon {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -269,8 +498,8 @@ main {
 @media (min-width: 370px) {
 
     .city-label {
-        font-size: .75rem;
-        font-weight: 300;
+        font-size: 1rem;
+        font-weight: 600;
         cursor: pointer;
     }
 
@@ -279,152 +508,16 @@ main {
     }
 
     header span {
-        font-weight: 300;
-        font-size: 1.0rem;
+        font-weight: 600;
+        font-size: 1.15rem;
     }
 
     header a {
-        font-size: 0.5rem;
+        font-size: 0.65rem;
     }
 
-    .temp-info {
-        font-size: 2.5rem;
-    }
-
-
-    /*  Start with this here then we can modify when it gets bigger if needed  */
-    .city-card-header-content {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr) 55px;
-        grid-template-rows: repeat(4, 1fr);
-        gap: 4px;
-    }
-
-    /* div1 city-resort-info */
-    .city-resort-info {
-        grid-column: span 2 / span 2;
-    }
-
-    /* div2 online-status-info */
-    .online-status-info {
-        grid-column-start: 3;
-    }
-
-    /* div3 city-or-timezone-info */
-    .city-or-timezone-info {
-        grid-row-start: 2;
-    }
-
-    /* div4 elevation-with-icon-info */
-    .elevation-with-icon-info {
-        grid-column-start: 1;
-        grid-row-start: 3;
-    }
-
-    /* div5 summary-info */
-    .summary-info {
-        grid-column-start: 1;
-        grid-row-start: 4;
-    }
-
-    /* div6 wind-info */
-    .wind-info {
-        grid-column-start: 2;
-        grid-row-start: 2;
-    }
-
-    /* div7 wind-chill-info */
-    .wind-chill-info {
-        grid-column-start: 2;
-        grid-row-start: 3;
-    }
-
-    /* div8 feels-like-info */
-    .feels-like-info {
-        grid-column-start: 2;
-        grid-row-start: 4;
-    }
-
-    /* div9 temp-info */
-    .temp-info {
-        grid-row: span 3 / span 3;
-        grid-column-start: 3;
-        grid-row-start: 2;
-    }
-
-    /* new row riding-conditions-info */
-    .riding-conditions-info {
-        display: flex;
-    }
-
-    .avalanche-risk {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        border-radius: var(--radius-sm);
-        font-size: 0.6rem;
-        font-weight: 500;
-        width: 50%;
-        padding: 0.25rem 0.5rem;
-        line-height: 1.5;
-    }
-
-    /* keep the same on right so columns all line up */
-    .city-card-body-content {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr) 55px;
-        grid-template-rows: repeat(4, 1fr);
-        gap: 4px;
-    }
-
-    .current-time-info {}
-
-    .snow-depth-info {
-        grid-column-start: 1;
-        grid-row-start: 2;
-    }
-
-    .precipitation-probability-info {
-        grid-column-start: 1;
-        grid-row-start: 3;
-    }
-
-    .humidity-info {
-        grid-column-start: 1;
-        grid-row-start: 4;
-    }
-
-    .daylight-info {
-        grid-column-start: 2;
-        grid-row-start: 1;
-    }
-
-    .snow-fall-info {
-        grid-column-start: 2;
-        grid-row-start: 2;
-    }
-
-    .precipitation-amount-info {
-        grid-column-start: 2;
-        grid-row-start: 3;
-    }
-
-    /* div 8, 9 and 10 left empty for now */
-    .div8 {
-        grid-column-start: 2;
-        grid-row-start: 4;
-    }
-
-    .div9 {
-        grid-row: span 2 / span 2;
-        grid-column-start: 3;
-        grid-row-start: 1;
-    }
-
-    .div10 {
-        grid-row: span 2 / span 2;
-        grid-column-start: 3;
-        grid-row-start: 3;
+    .temp-value {
+        font-size: 2.8rem;
     }
 
 
@@ -439,17 +532,17 @@ main {
     }
 
     .city-label {
-        font-size: 1rem;
-        font-weight: 300;
+        font-size: 1.05rem;
+        font-weight: 600;
     }
 
     header span {
-        font-weight: 300;
-        font-size: 1.0rem;
+        font-weight: 600;
+        font-size: 1.2rem;
     }
 
     header a {
-        font-size: 0.5rem;
+        font-size: 0.7rem;
     }
 }
 
@@ -674,19 +767,3 @@ main {
 }
 
 
-.remove-city {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    background: transparent;
-    border: none;
-    font-size: 1.5rem;
-    color: var(--text-tertiary);
-    cursor: pointer;
-    line-height: 1;
-    z-index: 10;
-}
-
-.remove-city:hover {
-    color: var(--avalanche-red);
-}

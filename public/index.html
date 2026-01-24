@@ -41,7 +41,10 @@
                      <!-- City Cards are injected here -->
                 <template id="city-card-template">
                     <article class="city-card">
-                        <button class="remove-city" aria-label="Remove">&times;</button>
+                        <button class="remove-city" type="button" aria-label="Remove city">
+                            <span class="remove-city-label">Remove</span>
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                         <div class="card-spinner">
                             <svg viewBox="0 0 32 32" width="32" height="32">
                                 <circle cx="16" cy="16" r="14" fill="none"></circle>
@@ -52,56 +55,73 @@
                                 <span class="city-label"></span>
                             </div>
                             <div class="online-status-info">
-                                <span class="online-status-icon">online</span>
-                            </div>
-                            <div class="city-or-timezone-info">
-                                <span class="city-timezone-label">timezone</span>
+                                <span class="online-status-tag">online</span>
                             </div>
                             <div class="elevation-with-icon-info">
-                                <img class="icon-svg elevation-icon" src="./images/meteocons/fill/svg/horizon.svg" alt="Elevation">
-                                <span class="elevation">elevation</span>
+                                <span class="info-label">Elevation</span>
+                                <span class="elevation info-value">elevation</span>
+                            </div>
+                            <div class="updated-info">
+                                <span class="info-label">Updated</span>
+                                <span class="updated-time info-value">updated</span>
                             </div>
                             <div class="summary-info">
-                                <span class="summary-icon"> </span> <span class="summary">summary</span>
+                                <span class="info-label">Conditions</span>
+                                <span class="summary info-value">summary</span>
                             </div>
                             <div class="wind-info">
-                                <span>Wind </span><span class="wind-speed">wind speed</span> mph
-                                <span class="wind-bearing">wind bearing</span>
+                                <span class="wind-icon"></span>
+                                <div class="wind-details">
+                                    <span class="info-label">Wind</span>
+                                    <span class="wind-speed info-value">wind speed</span>
+                                    <span class="info-unit">mph</span>
+                                    <span class="wind-bearing info-value">wind bearing</span>
+                                </div>
                             </div>
                             <div class="wind-chill-info">
-                                🌡️ <span>Wind Chill </span><span class="wind-chill">wind chill</span>°
+                                <span class="info-label">Wind Chill</span>
+                                <span class="wind-chill info-value">wind chill</span>
                             </div>
                             <div class="feels-like-info">
-                                <span>Feels Like </span><span class="feels-like">feels like</span>°
+                                <span class="info-label">Feels Like</span>
+                                <span class="feels-like info-value">feels like</span>
                             </div>
                             <div class="temp-info">
-                                <span class="temp-current">0</span>°
+                                <div class="temp-value">
+                                    <span class="temp-current">0</span>
+                                    <img class="icon-svg temp-unit-icon" src="./images/meteocons/fill/svg/fahrenheit.svg" alt="Fahrenheit">
+                                </div>
+                                <div class="summary-icon"></div>
                             </div>
                         </div>
                         <div class="riding-conditions-info">
-                            <span class="avalanche-risk"></span>
+                            <div class="avalanche-risk"></div>
+                            <div class="riding-conditions"></div>
                         </div>
                         <div class="city-card-body-content">
-                            <div class="current-time-info">
-                                <span>Updated </span><span class="current-time"></span>
-                            </div>
                             <div class="snow-depth-info">
-                                <span>Snow Depth </span><span class="snow-depth"></span>
+                                <span class="info-label">Snow Depth</span>
+                                <span class="snow-depth info-value"></span>
                             </div>
                             <div class="precipitation-probability-info">
-                                <span>Chance Precip </span><span class="precipitation-probablity"></span>
+                                <span class="info-label">Chance Precip</span>
+                                <span class="precipitation-probablity info-value"></span>
                             </div>
                             <div class="humidity-info">
-                                <span>Humidity </span><span class="humidity"></span>
+                                <span class="info-label">Humidity</span>
+                                <span class="humidity info-value"></span>
                             </div>
                             <div class="daylight-info">
-                                <span>Daylight </span><span class="daylight"></span>
+                                <span class="info-label">Daylight</span>
+                                <span class="daylight info-value"></span>
                             </div>
                             <div class="snow-fall-info">
-                                <span>Snow Fall </span><span class="snow-fall"></span>
+                                <span class="info-label">Snow Fall</span>
+                                <span class="snow-fall info-value"></span>
                             </div>
                             <div class="precipitation-amount-info">
-                                <span>Precip Amount </span><span class="precipitation-amount"></span>
+                                <span class="info-label">Precip Amount</span>
+                                <span class="precipitation-amount info-value"></span>
                             </div>
                         </div>
                         <div class="forecast-info">

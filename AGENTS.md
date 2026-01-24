@@ -40,10 +40,14 @@ Located here: https://open-meteo.com/en/docs
 - Add comments as needed but do not be overly verbose
 
 ## Project Notes (Icons)
-- Weather icon mapping lives in `server.js` (mapWeatherCodeToIcon, weatherIcons, iconFallback); server currently returns emoji strings via `getWeatherEmoji`.
-- Front-end renders icons as text in `public/scripts/app.js`:
-  - `data.currently.icon` is concatenated into the summary text.
-  - `day.icon` is inserted into `.forecast-icon` markup.
-- Icon sizing is currently controlled by font-size in `public/styles/styles.css` (e.g. `.forecast-icon`), so emoji scale with text.
+- Weather icon mapping lives in `server.js` (mapWeatherCodeToIcon, weatherIcons, iconFallback); server returns Meteocons SVG paths via `getWeatherIcon`.
+- Front-end renders icons as `<img>` elements in `public/scripts/app.js` for summary, forecast, wind, avalanche risk, and riding conditions.
+- Icon sizing is controlled by `em`-based styles in `public/styles/styles.css` (e.g. `.summary-icon`, `.forecast-icon`, `.wind-icon`).
 - Meteocons SVGs are stored in `public/images/meteocons/fill/svg`.
 - Legacy icon CSS exists in `public/styles/inline.css` for `.icon.*` background images; current UI uses `public/styles/styles.css` and does not apply those classes.
+
+## Project Notes (Mobile First UI)
+- Mobile-first layout for cards is defined in `public/styles/styles.css` (base rules, iPhone SE 375px), with media queries scaling up from there.
+- Header grid for cards uses `grid-template-areas` in `.city-card-header-content`; summary icon now lives under `.temp-info`.
+- `public/scripts/app.js` renders Meteocons SVGs (summary, wind, avalanche, riding conditions) via `<img>` elements with `.icon-svg`.
+- Server now returns `windIcon`, `avalancheIcon`, `ridingCondition`, and `ridingConditionIcon` alongside weather data in `server.js`.

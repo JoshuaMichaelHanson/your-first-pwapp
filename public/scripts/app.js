@@ -200,10 +200,10 @@ function renderForecast(card, data) {
 
     // Elevation
     if (data.elevation) {
-        card.querySelector(".elevation").textContent = `${Math.round(data.elevation)}f elevation`;
+        card.querySelector(".elevation").textContent = `${Math.round(data.elevation)} ft`;
     }
 
-    card.querySelector(".city-timezone-label").textContent = data.timezone;
+    card.querySelector(".updated-time").textContent = formatUpdateTime(data.currently.time);
     card.querySelector(".temp-current").textContent = data.currently.temperature;
     const summaryIcon = card.querySelector(".summary-icon");
     summaryIcon.innerHTML = "";
@@ -212,25 +212,69 @@ function renderForecast(card, data) {
         summaryIcon.appendChild(summaryImg);
     }
     card.querySelector(".summary").textContent = data.currently.summary;
+    const windIcon = card.querySelector(".wind-icon");
+    windIcon.innerHTML = "";
+    const windImg = createIconImg(data.currently.windIcon, "Wind strength");
+    if (windImg) {
+        windIcon.appendChild(windImg);
+    }
     card.querySelector(".wind-speed").textContent = data.currently.windSpeed;
     card.querySelector(".wind-bearing").textContent = data.currently.windBearing;
-    card.querySelector(".wind-chill").textContent = data.currently.windChill;
-    card.querySelector(".feels-like").textContent = data.currently.feelsLike;
+    card.querySelector(".wind-chill").textContent = `${data.currently.windChill} F`;
+    card.querySelector(".feels-like").textContent = `${data.currently.feelsLike} F`;
     const avalancheRisk = card.querySelector(".avalanche-risk");
     avalancheRisk.textContent = "";
+    avalancheRisk.classList.remove(
+        "avalanche-risk-low",
+        "avalanche-risk-moderate",
+        "avalanche-risk-high",
+        "avalanche-risk-very-high",
+        "avalanche-risk-unknown"
+    );
+    const avalancheValueText = data.currently.avalancheRisk || "unknown";
     const avalancheImg = createIconImg(
         data.currently.avalancheIcon,
-        `Avalanche risk ${data.currently.avalancheRisk}`
+        `Avalanche risk ${avalancheValueText}`
     );
     if (avalancheImg) {
         avalancheRisk.appendChild(avalancheImg);
     }
-    avalancheRisk.appendChild(
-        document.createTextNode(`Avalanche Risk: ${data.currently.avalancheRisk.toUpperCase()}`)
-    );
-    avalancheRisk.classList.add(getAvalancheRiskClass(data.currently.avalancheRisk));
+    const avalancheLabel = document.createElement("span");
+    avalancheLabel.classList.add("info-label");
+    avalancheLabel.textContent = "Avalanche Risk";
+    const avalancheValue = document.createElement("span");
+    avalancheValue.classList.add("info-value");
+    avalancheValue.textContent = avalancheValueText.toUpperCase();
+    avalancheRisk.appendChild(avalancheLabel);
+    avalancheRisk.appendChild(avalancheValue);
+    avalancheRisk.classList.add(getAvalancheRiskClass(avalancheValueText));
 
-    card.querySelector(".current-time").textContent = formatUpdateTime(data.currently.time);
+    const ridingConditions = card.querySelector(".riding-conditions");
+    ridingConditions.textContent = "";
+    ridingConditions.classList.remove(
+        "riding-condition-ice",
+        "riding-condition-groomers",
+        "riding-condition-powder",
+        "riding-condition-epic-powder"
+    );
+    const ridingCondition = data.currently.ridingCondition || "groomers";
+    const ridingImg = createIconImg(
+        data.currently.ridingConditionIcon,
+        `Riding conditions ${ridingCondition}`
+    );
+    if (ridingImg) {
+        ridingConditions.appendChild(ridingImg);
+    }
+    const ridingLabel = document.createElement("span");
+    ridingLabel.classList.add("info-label");
+    ridingLabel.textContent = "Riding";
+    const ridingValue = document.createElement("span");
+    ridingValue.classList.add("info-value");
+    ridingValue.textContent = ridingCondition.toUpperCase();
+    ridingConditions.appendChild(ridingLabel);
+    ridingConditions.appendChild(ridingValue);
+    ridingConditions.classList.add(`riding-condition-${ridingCondition.replace(" ", "-")}`);
+
     card.querySelector(".snow-depth").textContent = data.currently.snowDepth + '"';
     card.querySelector(".precipitation-probablity").textContent = data.currently.precipitationProbability + '%';
     card.querySelector(".humidity").textContent = data.currently.humidity + '%';

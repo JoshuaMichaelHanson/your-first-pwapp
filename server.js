@@ -275,6 +275,13 @@ function calculateWindChill(tempF, windMph) {
   return Math.round(35.74 + (0.6215 * tempF) - (35.75 * Math.pow(windMph, 0.16)) + (0.4275 * tempF * Math.pow(windMph, 0.16)));
 }
 
+function getWindLevel(windMph) {
+  if (windMph < 1) return "calm";
+  if (windMph < 10) return "light";
+  if (windMph < 20) return "moderate";
+  return "strong";
+}
+
 function calculateAvalancheRisk(snowfall24h, recentSnowfall, windSpeed) {
   console.log('Calculating avalanche risk:', snowfall24h, recentSnowfall, windSpeed);
   const totalSnow3Days = recentSnowfall.slice(0, 3).reduce((sum, amount) => sum + amount, 0);
@@ -320,6 +327,22 @@ function getWeatherIcon(iconName) {
 
 function getAvalancheIcon(risk) {
   return avalancheIcons[risk] ?? iconFallback;
+}
+
+function getWindIcon(windMph) {
+  const level = getWindLevel(windMph ?? 0);
+  return windIcons[level] ?? iconFallback;
+}
+
+function getRidingCondition(snowfall24h, tempF) {
+  if (snowfall24h >= 6) return "epic powder";
+  if (snowfall24h >= 2) return "powder";
+  if (tempF <= 20) return "ice";
+  return "groomers";
+}
+
+function getRidingConditionIcon(condition) {
+  return ridingConditionsIcons[condition] ?? iconFallback;
 }
 
 function getWeatherSummary(code) {
@@ -414,6 +437,8 @@ async function getForecast(req, resp) {
     const iconKey = mapWeatherCodeToIcon(current.weather_code ?? 0, isDay);
     const windDirLabel = degreesToCardinal(current.wind_direction_10m ?? 0);
     const windChill = calculateWindChill(current.temperature_2m ?? 0, current.wind_speed_10m ?? 0);
+    const snowfall24h = daily.snowfall_sum?.[2] ?? 0;
+    const ridingCondition = getRidingCondition(snowfall24h, current.temperature_2m ?? 0);
 
     console.log('Current:', current);
     console.log('Daily:', daily);
@@ -444,8 +469,11 @@ async function getForecast(req, resp) {
         windSpeed: current.wind_speed_10m,
         windBearing: windDirLabel,
         windChill: windChill,
+        windIcon: getWindIcon(current.wind_speed_10m ?? 0),
         avalancheRisk: avalancheRisk,
         avalancheIcon: getAvalancheIcon(avalancheRisk),
+        ridingCondition: ridingCondition,
+        ridingConditionIcon: getRidingConditionIcon(ridingCondition),
         sunrise: data.daily?.sunrise?.[2] * 1000, // we went 2 days back to get recent snow-fall
         sunset: data.daily?.sunset?.[2] * 1000,
       },
