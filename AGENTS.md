@@ -33,7 +33,7 @@ Located here: https://open-meteo.com/en/docs
 - Use dashed names when more than one word is used
 - https://developer.mozilla.org/en-US/docs/MDN/Writing_guidelines/Code_style_guide/CSS
 
-## Junie Instructions
+## AGENT (junie, claude, codex, copilot) Instructions
 - Save temp files in a folder named .junie/temp_files
 - Create Todo-{feature-name}.md files for all steps you implement
 - Check off steps from the todo-{feature-name}.md files as tasks are completed incase we need to start again

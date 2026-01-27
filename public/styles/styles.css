@@ -48,17 +48,39 @@ header {
     position: sticky;
     top: 0;
     z-index: 20;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+        "credit actions"
+        "title actions";
+    align-items: center;
+    gap: 0.35rem 1rem;
 }
 
-header span {
+.header-title {
     font-weight: 600;
     font-size: 1.1rem;
+    grid-area: title;
 }
 
-header a {
+.header-credit {
     font-size: 0.6rem;
+    grid-area: credit;
+    color: var(--text-secondary);
+    text-decoration: none;
 }
 
+.header-credit:hover {
+    text-decoration: underline;
+}
+
+.header-actions {
+    grid-area: actions;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-self: end;
+}
 
 main {
     display: flex;
@@ -87,88 +109,101 @@ main {
     margin-bottom: 1.5rem;
 }
 
-.city-card-header-content {
+.city-card-grid {
     display: grid;
-    grid-template-columns: 1.6fr 1.1fr 90px;
-    grid-template-areas:
-        "location location status"
-        "updated wind temp"
-        "elevation windchill temp"
-        "summary feels temp";
-    gap: 0.4rem 0.6rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem 0.8rem;
     align-items: start;
 }
 
+.city-card-header-content {
+    display: contents;
+}
+
 .city-resort-info {
-    grid-area: location;
+    grid-column: 1;
+    grid-row: 1;
 }
 
 .online-status-info {
-    grid-area: status;
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: center;
+}
+
+.remove-city {
+    grid-column: 3;
+    grid-row: 1;
     justify-self: end;
 }
 
 .updated-info {
-    grid-area: updated;
+    grid-column: 1;
+    grid-row: 3;
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
 }
 
 .elevation-with-icon-info {
-    grid-area: elevation;
+    grid-column: 1;
+    grid-row: 4;
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
 }
 
 .summary-info {
-    grid-area: summary;
-}
-
-.wind-info {
-    grid-area: wind;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    grid-column: 2;
+    grid-row: 3;
 }
 
 .wind-icon {
-    font-size: 1.8rem;
+    grid-column: 3;
+    grid-row: 2;
+    font-size: 2.4rem;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.wind-icon .icon-svg {
+    width: 2.4em;
+    height: 2.4em;
 }
 
 .wind-details {
+    grid-column: 3;
+    grid-row: 3;
     display: flex;
     flex-wrap: wrap;
     gap: 0.3rem;
 }
 
 .wind-chill-info {
-    grid-area: windchill;
+    grid-column: 3;
+    grid-row: 4;
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
 }
 
 .feels-like-info {
-    grid-area: feels;
+    grid-column: 2;
+    grid-row: 4;
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
 }
 
 .temp-info {
-    grid-area: temp;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
+    display: contents;
 }
 
 .temp-value {
+    grid-column: 1;
+    grid-row: 2;
     display: flex;
     align-items: flex-start;
     gap: 0.2rem;
@@ -183,9 +218,43 @@ main {
 }
 
 .city-card-body-content {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.6rem 0.8rem;
+    display: contents;
+}
+
+.city-card-body-content > div {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.snow-depth-info {
+    grid-column: 1;
+    grid-row: 6;
+}
+
+.snow-fall-info {
+    grid-column: 2;
+    grid-row: 6;
+}
+
+.precipitation-amount-info {
+    grid-column: 3;
+    grid-row: 6;
+}
+
+.precipitation-probability-info {
+    grid-column: 1;
+    grid-row: 7;
+}
+
+.daylight-info {
+    grid-column: 2;
+    grid-row: 7;
+}
+
+.humidity-info {
+    grid-column: 3;
+    grid-row: 7;
 }
 
 .info-label {
@@ -242,6 +311,8 @@ main {
     justify-content: center;
     font-size: 2.4rem;
     line-height: 1;
+    grid-column: 2;
+    grid-row: 2;
 }
 
 .summary-icon .icon-svg {
@@ -250,27 +321,55 @@ main {
 }
 
 .avalanche-risk .icon-svg {
-    width: 1.1em;
-    height: 1.1em;
+    width: 1.6em;
+    height: 1.6em;
 }
 
 .riding-conditions-info {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
+    display: contents;
 }
 
 .avalanche-risk,
 .riding-conditions {
-    display: inline-flex;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 0.5rem;
+    row-gap: 0.2rem;
     align-items: center;
-    gap: 0.4rem;
     border-radius: 999px;
     padding: 0.4rem 0.75rem;
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.04em;
+}
+
+.avalanche-risk {
+    grid-column: 1;
+    grid-row: 5;
+}
+
+.riding-conditions {
+    grid-column: 2;
+    grid-row: 5;
+}
+
+.avalanche-risk .icon-svg,
+.riding-conditions .icon-svg {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+}
+
+.avalanche-risk .info-label,
+.riding-conditions .info-label {
+    grid-column: 2;
+    grid-row: 1;
+}
+
+.avalanche-risk .info-value,
+.riding-conditions .info-value {
+    grid-column: 2;
+    grid-row: 2;
 }
 
 .riding-conditions {
@@ -299,14 +398,12 @@ main {
 }
 
 .riding-conditions .icon-svg {
-    width: 1.1em;
-    height: 1.1em;
+    width: 1.6em;
+    height: 1.6em;
 }
 
 .remove-city {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
+    position: static;
     background: rgba(15, 23, 42, 0.05);
     border: none;
     border-radius: 999px;
@@ -450,7 +547,7 @@ main {
 }
 
 .forecast-icon {
-    font-size: 1.9rem;
+    font-size: 2.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -507,12 +604,12 @@ main {
         text-decoration: underline;
     }
 
-    header span {
+    .header-title {
         font-weight: 600;
         font-size: 1.15rem;
     }
 
-    header a {
+    .header-credit {
         font-size: 0.65rem;
     }
 
@@ -536,12 +633,12 @@ main {
         font-weight: 600;
     }
 
-    header span {
+    .header-title {
         font-weight: 600;
         font-size: 1.2rem;
     }
 
-    header a {
+    .header-credit {
         font-size: 0.7rem;
     }
 }
@@ -575,7 +672,7 @@ main {
         max-width: 960px;
     }
 
-    header span {
+    .header-title {
         font-weight: 600;
         font-size: 1.5rem;
     }
@@ -603,7 +700,7 @@ main {
         max-width: 1320px;
     }
 
-    header span {
+    .header-title {
         font-weight: 600;
         font-size: 1.5rem;
     }
@@ -627,50 +724,44 @@ main {
 @media (max-width: 800.00px) {
 
     header {
-        display: flex;
-        flex-direction: column;
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-areas:
+            "credit"
+            "title"
+            "actions";
+        justify-items: start;
     }
 
 }
 
-/* Floating Action Buttons */
-.fab-container {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    z-index: 1000;
-}
-
 .fab {
-    background-color: var(--accent);
-    border: none;
-    border-radius: 50%;
-    box-shadow: var(--shadow-md);
+    background-color: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 999px;
     cursor: pointer;
-    height: 56px;
-    width: 56px;
+    height: 30px;
+    min-width: 42px;
+    padding: 0 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: background-color 0.2s, transform 0.2s;
+    transition: background-color 0.2s, transform 0.2s, border-color 0.2s;
 }
 
 .fab:hover {
-    background-color: var(--accent-hover);
-    transform: scale(1.05);
+    background-color: rgba(124, 58, 237, 0.18);
+    border-color: rgba(124, 58, 237, 0.35);
+    transform: translateY(-1px);
 }
 
 .fab:active {
-    transform: scale(0.95);
+    transform: translateY(0);
 }
 
 .fab img {
-    width: 24px;
-    height: 24px;
-    filter: brightness(0) invert(1);
+    width: 16px;
+    height: 16px;
+    filter: none;
 }
 
 /* Dialog Styles */
