@@ -35,6 +35,19 @@ body {
     font-size: 12px;
 }
 
+body.theme-dark {
+    --bg: #0b1120;
+    --surface: #111827;
+    --text: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-tertiary: #64748b;
+    --border: rgba(148, 163, 184, 0.2);
+    --accent: #38bdf8;
+    --accent-hover: #0ea5e9;
+    --shadow-sm: 0 6px 16px -6px rgba(15, 23, 42, 0.55);
+    --shadow-md: 0 12px 24px -10px rgba(15, 23, 42, 0.6);
+}
+
 .app-shell {
     min-height: 100vh;
     display: flex;
@@ -51,7 +64,7 @@ header {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-        "credit actions"
+        "credit credit"
         "title actions";
     align-items: center;
     gap: 0.35rem 1rem;
@@ -61,6 +74,9 @@ header {
     font-weight: 600;
     font-size: 1.1rem;
     grid-area: title;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
 }
 
 .header-credit {
@@ -80,6 +96,45 @@ header {
     align-items: center;
     gap: 0.5rem;
     justify-self: end;
+    position: relative;
+}
+
+.header-menu {
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    right: 0;
+    display: none;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 190px;
+    padding: 0.75rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    z-index: 30;
+}
+
+.header-menu.is-open {
+    display: flex;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--text);
+    cursor: pointer;
+}
+
+.menu-item input {
+    accent-color: var(--accent);
+}
+
+.header-logo {
+    width: 1.35rem;
+    height: 1.35rem;
 }
 
 main {
@@ -205,7 +260,10 @@ main {
     grid-column: 1;
     grid-row: 2;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
+    align-self: stretch;
+    height: 100%;
     gap: 0.2rem;
     font-size: 2.6rem;
     font-weight: 700;
@@ -284,6 +342,19 @@ main {
     font-size: 0.7rem;
 }
 
+.info-link {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--text-secondary);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: underline;
+    white-space: nowrap;
+}
+
 .online-status-tag {
     display: inline-flex;
     align-items: center;
@@ -326,50 +397,47 @@ main {
 }
 
 .riding-conditions-info {
-    display: contents;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
 }
 
 .avalanche-risk,
 .riding-conditions {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    column-gap: 0.5rem;
-    row-gap: 0.2rem;
+    display: inline-flex;
     align-items: center;
+    gap: 0.45rem;
+    flex-wrap: nowrap;
+    white-space: nowrap;
     border-radius: 999px;
-    padding: 0.4rem 0.75rem;
+    padding: 0.45rem 0.75rem;
     font-size: 0.7rem;
     font-weight: 700;
     letter-spacing: 0.04em;
 }
 
 .avalanche-risk {
-    grid-column: 1;
-    grid-row: 5;
+    flex: 1 1 50%;
 }
 
 .riding-conditions {
-    grid-column: 2;
-    grid-row: 5;
+    flex: 1 1 50%;
 }
 
 .avalanche-risk .icon-svg,
 .riding-conditions .icon-svg {
-    grid-column: 1;
-    grid-row: 1 / span 2;
+    width: 2em;
+    height: 2em;
 }
 
 .avalanche-risk .info-label,
 .riding-conditions .info-label {
-    grid-column: 2;
-    grid-row: 1;
+    display: inline;
 }
 
 .avalanche-risk .info-value,
 .riding-conditions .info-value {
-    grid-column: 2;
-    grid-row: 2;
+    display: inline;
 }
 
 .riding-conditions {
@@ -398,8 +466,8 @@ main {
 }
 
 .riding-conditions .icon-svg {
-    width: 1.6em;
-    height: 1.6em;
+    width: 2em;
+    height: 2em;
 }
 
 .remove-city {
@@ -510,6 +578,10 @@ main {
     /* margin-top: 1rem; */
     border-top: 1px solid var(--border);
     padding-top: 1rem;
+}
+
+.forecast-collapsed .forecast-info {
+    display: none;
 }
 
 .forecast-day {
@@ -641,6 +713,18 @@ main {
     .header-credit {
         font-size: 0.7rem;
     }
+
+    .avalanche-risk {
+        flex: 1 1 50%;
+    }
+
+    .riding-conditions {
+        flex: 1 1 50%;
+    }
+
+    .riding-conditions-info {
+        flex-direction: row;
+    }
 }
 
 @media (min-width: 768px) {
@@ -651,14 +735,39 @@ main {
         max-width: 720px;
     }
 
-    .avalanche-risk {
-        display: flex;
+    .forecast-day {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 1fr;
+        grid-template-areas:
+            "date icon"
+            "high icon"
+            "snow icon"
+            "precip icon";
         align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border-radius: var(--radius-sm);
-        font-size: 0.9rem;
-        font-weight: 500;
+        text-align: left;
+    }
+
+    .forecast-date {
+        grid-area: date;
+    }
+
+    .forecast-high-low {
+        grid-area: high;
+    }
+
+    .forecast-snow {
+        grid-area: snow;
+        justify-content: flex-start;
+    }
+
+    .forecast-precip {
+        grid-area: precip;
+    }
+
+    .forecast-icon {
+        grid-area: icon;
+        justify-self: center;
+        font-size: 2.6rem;
     }
 
 }
@@ -724,11 +833,10 @@ main {
 @media (max-width: 800.00px) {
 
     header {
-        grid-template-columns: minmax(0, 1fr);
+        grid-template-columns: minmax(0, 1fr) auto;
         grid-template-areas:
-            "credit"
-            "title"
-            "actions";
+            "credit credit"
+            "title actions";
         justify-items: start;
     }
 
@@ -761,7 +869,7 @@ main {
 .fab img {
     width: 16px;
     height: 16px;
-    filter: none;
+    filter: brightness(0);
 }
 
 /* Dialog Styles */
@@ -781,6 +889,28 @@ main {
 #addDialogContainer.visible {
     opacity: 1;
     pointer-events: auto;
+}
+
+.info-dialog-container {
+    background: rgba(0, 0, 0, 0.5);
+    height: 100%;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 100%;
+    z-index: 2000;
+}
+
+.info-dialog-container.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.info-dialog {
+    max-width: 420px;
 }
 
 .dialog {

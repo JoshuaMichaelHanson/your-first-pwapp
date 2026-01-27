@@ -21,6 +21,21 @@ const weatherApp = {
     selectedLocations: {},
     addDialogContainer: document.getElementById("addDialogContainer")
 };
+const preferences = {
+    forecastCollapsed: false,
+    themeMode: "light"
+};
+
+const justificationContent = {
+    avalanche: {
+        title: "Avalanche Risk",
+        body: "Ratings combine recent snowfall, wind transport, temperature swings, and slope exposure. We also compare this data to regional guidance. This score will evolve as we learn more from local conditions."
+    },
+    riding: {
+        title: "Riding Conditions",
+        body: "Conditions summarize grooming reports, new snow, melt-freeze cycles, and wind effect. This estimate will change over time as we tune the model with resort feedback."
+    }
+};
 
 function createIconImg(src, altText) {
     if (!src) {
@@ -33,6 +48,127 @@ function createIconImg(src, altText) {
     img.decoding = "async";
     img.loading = "lazy";
     return img;
+}
+
+function setForecastCollapsed(isCollapsed) {
+    document.body.classList.toggle("forecast-collapsed", isCollapsed);
+    localStorage.setItem("forecastCollapsed", JSON.stringify(isCollapsed));
+    const toggleForecast = document.getElementById("toggleForecast");
+    if (toggleForecast) {
+        toggleForecast.checked = isCollapsed;
+    }
+}
+
+function setThemeMode(themeMode) {
+    const isDark = themeMode === "dark";
+    document.body.classList.toggle("theme-dark", isDark);
+    localStorage.setItem("themeMode", themeMode);
+    const toggleTheme = document.getElementById("toggleTheme");
+    if (toggleTheme) {
+        toggleTheme.checked = isDark;
+    }
+}
+
+function openInfoDialog(type) {
+    const dialogContainer = document.getElementById("infoDialogContainer");
+    const dialogTitle = document.getElementById("infoDialogTitle");
+    const dialogBody = document.getElementById("infoDialogBody");
+    const content = justificationContent[type];
+    if (!dialogContainer || !dialogTitle || !dialogBody || !content) {
+        return;
+    }
+    dialogTitle.textContent = content.title;
+    dialogBody.textContent = content.body;
+    dialogContainer.classList.add("visible");
+    dialogContainer.setAttribute("aria-hidden", "false");
+}
+
+function closeInfoDialog() {
+    const dialogContainer = document.getElementById("infoDialogContainer");
+    if (!dialogContainer) {
+        return;
+    }
+    dialogContainer.classList.remove("visible");
+    dialogContainer.setAttribute("aria-hidden", "true");
+}
+
+function addJustificationLink(container, type) {
+    const link = document.createElement("button");
+    link.type = "button";
+    link.classList.add("info-link");
+    link.textContent = "Why";
+    link.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        openInfoDialog(type);
+    });
+    container.appendChild(link);
+}
+
+function initHeaderMenu() {
+    const menuButton = document.getElementById("butMenu");
+    const menu = document.getElementById("headerMenu");
+    const toggleForecast = document.getElementById("toggleForecast");
+    const toggleTheme = document.getElementById("toggleTheme");
+    if (!menuButton || !menu) {
+        return;
+    }
+
+    const closeMenu = () => {
+        menu.classList.remove("is-open");
+        menu.setAttribute("aria-hidden", "true");
+        menuButton.setAttribute("aria-expanded", "false");
+    };
+
+    menuButton.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const isOpen = menu.classList.toggle("is-open");
+        menu.setAttribute("aria-hidden", String(!isOpen));
+        menuButton.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    document.addEventListener("click", (event) => {
+        if (!menu.contains(event.target) && event.target !== menuButton) {
+            closeMenu();
+        }
+    });
+
+    const savedForecast = localStorage.getItem("forecastCollapsed");
+    if (savedForecast !== null) {
+        preferences.forecastCollapsed = JSON.parse(savedForecast);
+    }
+    setForecastCollapsed(preferences.forecastCollapsed);
+
+    const savedTheme = localStorage.getItem("themeMode");
+    if (savedTheme) {
+        preferences.themeMode = savedTheme;
+    } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        preferences.themeMode = "dark";
+    }
+    setThemeMode(preferences.themeMode);
+
+    if (toggleForecast) {
+        toggleForecast.addEventListener("change", () => {
+            setForecastCollapsed(toggleForecast.checked);
+        });
+    }
+
+    if (toggleTheme) {
+        toggleTheme.addEventListener("change", () => {
+            setThemeMode(toggleTheme.checked ? "dark" : "light");
+        });
+    }
+}
+
+function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) {
+        return;
+    }
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("/service-worker.js").catch((error) => {
+            console.error("Service worker registration failed", error);
+        });
+    });
 }
 
 /**
@@ -247,6 +383,7 @@ function renderForecast(card, data) {
     avalancheValue.textContent = avalancheValueText.toUpperCase();
     avalancheRisk.appendChild(avalancheLabel);
     avalancheRisk.appendChild(avalancheValue);
+    addJustificationLink(avalancheRisk, "avalanche");
     avalancheRisk.classList.add(getAvalancheRiskClass(avalancheValueText));
 
     const ridingConditions = card.querySelector(".riding-conditions");
@@ -273,6 +410,7 @@ function renderForecast(card, data) {
     ridingValue.textContent = ridingCondition.toUpperCase();
     ridingConditions.appendChild(ridingLabel);
     ridingConditions.appendChild(ridingValue);
+    addJustificationLink(ridingConditions, "riding");
     ridingConditions.classList.add(`riding-condition-${ridingCondition.replace(" ", "-")}`);
 
     card.querySelector(".snow-depth").textContent = data.currently.snowDepth + '"';
@@ -507,6 +645,15 @@ function init() {
     document.getElementById("butAddCurrent").addEventListener("click", showAddCurrentLocationDialog);
     document.getElementById("butDialogCancel").addEventListener("click", toggleAddDialog);
     document.getElementById("butDialogAdd").addEventListener("click", addLocation);
+    document.getElementById("butInfoDialogClose").addEventListener("click", closeInfoDialog);
+    const infoDialogContainer = document.getElementById("infoDialogContainer");
+    infoDialogContainer.addEventListener("click", (event) => {
+        if (event.target === infoDialogContainer) {
+            closeInfoDialog();
+        }
+    });
+    initHeaderMenu();
+    registerServiceWorker();
 }
 
 init();

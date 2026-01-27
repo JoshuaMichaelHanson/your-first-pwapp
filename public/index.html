@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Winter Sports Weather PWA</title>
+    <title>Wilderness Winter Weather</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#f8fafc" />
     <link rel="manifest" href="./manifest.json">
@@ -25,7 +25,10 @@
             <a class="header-credit" href="https://open-meteo.com/">
                 Weather data by Open-Meteo.com
             </a>
-            <span class="header-title">🎿 Hanson's Family Winter Weather</span>
+            <span class="header-title">
+                <img class="header-logo" src="./images/icons/wilderness-weather.svg" alt="Wilderness Winter Weather">
+                Wilderness Winter Weather
+            </span>
             <div class="header-actions">
                 <button id="butAdd" class="fab" aria-label="Add from list">
                     <img src="./images/add.svg" alt="Add from list">
@@ -33,6 +36,19 @@
                 <button id="butAddCurrent" class="fab" aria-label="Add current location">
                     <img src="./images/locate.svg" alt="Add current location">
                 </button>
+                <button id="butMenu" class="fab" aria-label="More actions" aria-expanded="false" aria-controls="headerMenu">
+                    <img src="./images/menu.svg" alt="More actions">
+                </button>
+                <div id="headerMenu" class="header-menu" role="menu" aria-hidden="true">
+                    <label class="menu-item" for="toggleForecast">
+                        <input type="checkbox" id="toggleForecast">
+                        Hide extended forecast
+                    </label>
+                    <label class="menu-item" for="toggleTheme">
+                        <input type="checkbox" id="toggleTheme">
+                        Dark mode
+                    </label>
+                </div>
             </div>
         </header>
         <main>
@@ -92,10 +108,6 @@
                                     <span class="wind-icon"></span>
                                 </div>
                             </div>
-                            <div class="riding-conditions-info">
-                                <div class="avalanche-risk"></div>
-                                <div class="riding-conditions"></div>
-                            </div>
                             <div class="city-card-body-content">
                                 <div class="snow-depth-info">
                                     <span class="info-label">Snow Depth</span>
@@ -122,6 +134,10 @@
                                     <span class="precipitation-amount info-value"></span>
                                 </div>
                             </div>
+                        </div>
+                        <div class="riding-conditions-info">
+                            <div class="avalanche-risk"></div>
+                            <div class="riding-conditions"></div>
                         </div>
                         <div class="forecast-info">
                             <!-- Inject forecast days here -->
@@ -201,6 +217,15 @@
             <div class="dialog-buttons">
                 <button id="butDialogCancel" class="button">Cancel</button>
                 <button id="butDialogAdd" class="button">Add</button>
+            </div>
+        </div>
+    </div>
+    <div id="infoDialogContainer" class="info-dialog-container" aria-hidden="true">
+        <div class="dialog info-dialog" role="dialog" aria-modal="true" aria-labelledby="infoDialogTitle">
+            <div class="dialog-title" id="infoDialogTitle">More details</div>
+            <div class="dialog-body" id="infoDialogBody"></div>
+            <div class="dialog-buttons">
+                <button id="butInfoDialogClose" class="button">Close</button>
             </div>
         </div>
     </div>

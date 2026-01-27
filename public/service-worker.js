@@ -18,16 +18,19 @@
 "use strict";
 
 // CODELAB: Update cache names any time any of the cached files change.
-const CACHE_NAME = "static-cache-v4-1";
-const DATA_CACHE_NAME = "data-cache-v3-1";
+const CACHE_NAME = "static-cache-v4-3";
+const DATA_CACHE_NAME = "data-cache-v3-2";
+const IMAGE_CACHE_NAME = "image-cache-v1-0";
 
 // CODELAB: Add list of files to cache here.
 const FILES_TO_CACHE = [
   "/",
   "/index.html",
+  "/manifest.json",
   "/scripts/app.js",
   "/scripts/install.js",
   "/scripts/luxon-1.11.4.js",
+  "/styles/styles.css",
   "/styles/inline.css",
   "/images/add.svg",
   "/images/clear-day.svg",
@@ -45,7 +48,9 @@ const FILES_TO_CACHE = [
   "/images/snow.svg",
   "/images/thunderstorm.svg",
   "/images/tornado.svg",
-  "/images/wind.svg"
+  "/images/wind.svg",
+  "/images/menu.svg",
+  "/images/icons/wilderness-weather.svg"
 ];
 
 self.addEventListener("install", evt => {
@@ -53,7 +58,7 @@ self.addEventListener("install", evt => {
   // CODELAB: Precache static resources here.
   evt.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
-      console.log("[ServiceWorker] Pre-caching offline page");
+      console.log("[ServiceWorker] Pre-caching offline assets");
       return cache.addAll(FILES_TO_CACHE);
     })
   );
@@ -67,7 +72,7 @@ self.addEventListener("activate", evt => {
     caches.keys().then(keyList => {
       return Promise.all(
         keyList.map(key => {
-          if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
+          if (key !== CACHE_NAME && key !== DATA_CACHE_NAME && key !== IMAGE_CACHE_NAME) {
             console.log("[ServiceWorker] Removing old cache", key);
             return caches.delete(key);
           }
@@ -80,8 +85,31 @@ self.addEventListener("activate", evt => {
 
 self.addEventListener("fetch", evt => {
   console.log("[ServiceWorker] Fetch", evt.request.url);
-  // CODELAB: Add fetch event handler here.
-  if (evt.request.url.includes("/forecast?")) {
+  if (evt.request.method !== "GET") {
+    return;
+  }
+
+  if (evt.request.mode === "navigate") {
+    evt.respondWith(
+      fetch(evt.request)
+        .then(response => {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(evt.request, responseClone));
+          return response;
+        })
+        .catch(() => {
+          return caches.open(CACHE_NAME).then(cache => {
+            return cache.match(evt.request).then(cachedResponse => {
+              return cachedResponse || cache.match("/index.html");
+            });
+          });
+        })
+    );
+    return;
+  }
+
+  // if no internet use the cached data
+  if (evt.request.url.includes("/forecast/") || evt.request.url.includes("/forecast?")) {
     console.log("[Service Worker] Fetch (data)", evt.request.url);
     evt.respondWith(
       caches.open(DATA_CACHE_NAME).then(cache => {
@@ -101,6 +129,24 @@ self.addEventListener("fetch", evt => {
     );
     return;
   }
+
+  if (evt.request.destination === "image") {
+    evt.respondWith(
+      caches.open(IMAGE_CACHE_NAME).then(cache => {
+        return cache.match(evt.request).then(response => {
+          return (
+            response ||
+            fetch(evt.request).then(fetchResponse => {
+              cache.put(evt.request, fetchResponse.clone());
+              return fetchResponse;
+            })
+          );
+        });
+      })
+    );
+    return;
+  }
+
   evt.respondWith(
     caches.open(CACHE_NAME).then(cache => {
       return cache.match(evt.request).then(response => {
