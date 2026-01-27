@@ -1,28 +1,11 @@
-/*
- * @license
- * Your First PWA Codelab (https://g.co/codelabs/pwa)
- * Copyright 2019 Google Inc. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License
- */
 "use strict";
 
-// CODELAB: Update cache names any time any of the cached files change.
+// TODO: Update cache names any time any of the cached files change.
 const CACHE_NAME = "static-cache-v4-3";
 const DATA_CACHE_NAME = "data-cache-v3-2";
 const IMAGE_CACHE_NAME = "image-cache-v1-0";
 
-// CODELAB: Add list of files to cache here.
+// Add a list of files to the cache here.
 const FILES_TO_CACHE = [
   "/",
   "/index.html",
@@ -67,7 +50,7 @@ self.addEventListener("install", evt => {
 
 self.addEventListener("activate", evt => {
   console.log("[ServiceWorker] Activate");
-  // CODELAB: Remove previous cached data from disk.
+  // NOTE: Remove previously cached data from the disk.
   evt.waitUntil(
     caches.keys().then(keyList => {
       return Promise.all(
@@ -108,7 +91,7 @@ self.addEventListener("fetch", evt => {
     return;
   }
 
-  // if no internet use the cached data
+  // if no internet uses the cached data
   if (evt.request.url.includes("/forecast/") || evt.request.url.includes("/forecast?")) {
     console.log("[Service Worker] Fetch (data)", evt.request.url);
     evt.respondWith(
