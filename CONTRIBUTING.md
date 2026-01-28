@@ -1,23 +1,9 @@
-# How to Contribute
+# Contributing
 
-We'd love to accept your patches and contributions to this project. There are
-just a few small guidelines you need to follow.
+Thanks for helping improve Wilderness Winter Weather! A few quick guidelines:
 
-## Contributor License Agreement
-
-Contributions to this project must be accompanied by a Contributor License
-Agreement. You (or your employer) retain the copyright to your contribution,
-this simply gives us permission to use and redistribute your contributions as
-part of the project. Head over to <https://cla.developers.google.com/> to see
-your current agreements on file or to sign a new one.
-
-You generally only need to submit a CLA once, so if you've already submitted one
-(even if it was for a different project), you probably don't need to do it
-again.
-
-## Code reviews
-
-All submissions, including submissions by project members, require review. We
-use GitHub pull requests for this purpose. Consult
-[GitHub Help](https://help.github.com/articles/about-pull-requests/) for more
-information on using pull requests.
+- **Branches/PRs**: Use focused branches and small PRs with a short summary plus what you tested (online/offline, UI checks).  
+- **Caching**: When you change cached assets or service worker behavior, bump cache names in `public/service-worker.js`.  
+- **Style**: Follow the existing ESLint/Prettier conventions, keep comments concise, and avoid unused assets or scripts.  
+- **Testing**: Spot-check mobile and desktop layouts; confirm the PWA still loads from cache when offline.  
+- **Security**: Prefer safe defaults, avoid exposing secrets, and validate any new inputs.

@@ -1,9 +1,9 @@
 "use strict";
 
 // TODO: Update cache names any time any of the cached files change.
-const CACHE_NAME = "static-cache-v4-3";
-const DATA_CACHE_NAME = "data-cache-v3-2";
-const IMAGE_CACHE_NAME = "image-cache-v1-0";
+const CACHE_NAME = "static-cache-v5-0";
+const DATA_CACHE_NAME = "data-cache-v4-0";
+const IMAGE_CACHE_NAME = "image-cache-v2-0";
 
 // Add a list of files to the cache here.
 const FILES_TO_CACHE = [
@@ -11,29 +11,57 @@ const FILES_TO_CACHE = [
   "/index.html",
   "/manifest.json",
   "/scripts/app.js",
-  "/scripts/install.js",
-  "/scripts/luxon-1.11.4.js",
   "/styles/styles.css",
-  "/styles/inline.css",
   "/images/add.svg",
-  "/images/clear-day.svg",
-  "/images/clear-night.svg",
-  "/images/cloudy.svg",
-  "/images/fog.svg",
-  "/images/hail.svg",
-  "/images/install.svg",
   "/images/locate.svg",
-  "/images/partly-cloudy-day.svg",
-  "/images/partly-cloudy-night.svg",
-  "/images/rain.svg",
-  "/images/refresh.svg",
-  "/images/sleet.svg",
-  "/images/snow.svg",
-  "/images/thunderstorm.svg",
-  "/images/tornado.svg",
-  "/images/wind.svg",
   "/images/menu.svg",
-  "/images/icons/wilderness-weather.svg"
+  "/images/icons/wilderness-weather.svg",
+  "/images/icons/icon-128x128.png",
+  "/images/icons/icon-144x144.png",
+  "/images/icons/icon-152x152.png",
+  "/images/icons/icon-192x192.png",
+  "/images/icons/icon-256x256.png",
+  "/images/icons/icon-512x512.png",
+  "/images/meteocons/fill/svg/fahrenheit.svg",
+  "/images/meteocons/fill/svg/not-available.svg",
+  "/images/meteocons/fill/svg/extreme.svg",
+  "/images/meteocons/fill/svg/extreme-day.svg",
+  "/images/meteocons/fill/svg/extreme-night.svg",
+  "/images/meteocons/fill/svg/extreme-day-fog.svg",
+  "/images/meteocons/fill/svg/extreme-night-fog.svg",
+  "/images/meteocons/fill/svg/extreme-fog.svg",
+  "/images/meteocons/fill/svg/extreme-day-drizzle.svg",
+  "/images/meteocons/fill/svg/extreme-night-drizzle.svg",
+  "/images/meteocons/fill/svg/extreme-drizzle.svg",
+  "/images/meteocons/fill/svg/extreme-day-rain.svg",
+  "/images/meteocons/fill/svg/extreme-night-rain.svg",
+  "/images/meteocons/fill/svg/extreme-rain.svg",
+  "/images/meteocons/fill/svg/extreme-day-snow.svg",
+  "/images/meteocons/fill/svg/extreme-night-snow.svg",
+  "/images/meteocons/fill/svg/extreme-snow.svg",
+  "/images/meteocons/fill/svg/thunderstorms-day-extreme.svg",
+  "/images/meteocons/fill/svg/thunderstorms-night-extreme.svg",
+  "/images/meteocons/fill/svg/thunderstorms-extreme.svg",
+  "/images/meteocons/fill/svg/alert-avalanche-danger.svg",
+  "/images/meteocons/fill/svg/code-green.svg",
+  "/images/meteocons/fill/svg/code-orange.svg",
+  "/images/meteocons/fill/svg/code-red.svg",
+  "/images/meteocons/fill/svg/snowflake.svg",
+  "/images/meteocons/fill/svg/snowman.svg",
+  "/images/meteocons/fill/svg/thermometer-mercury-cold.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-0.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-1.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-2.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-3.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-4.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-5.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-6.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-7.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-8.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-9.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-10.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-11.svg",
+  "/images/meteocons/fill/svg/wind-beaufort-12.svg"
 ];
 
 self.addEventListener("install", evt => {
@@ -133,7 +161,17 @@ self.addEventListener("fetch", evt => {
   evt.respondWith(
     caches.open(CACHE_NAME).then(cache => {
       return cache.match(evt.request).then(response => {
-        return response || fetch(evt.request);
+        if (response) {
+          return response;
+        }
+        return fetch(evt.request)
+          .then(fetchResponse => {
+            if (fetchResponse.status === 200) {
+              cache.put(evt.request, fetchResponse.clone());
+            }
+            return fetchResponse;
+          })
+          .catch(() => cache.match(evt.request));
       });
     })
   );

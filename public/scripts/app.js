@@ -213,7 +213,7 @@ function createCardAndUpdateSavedList(location) {
     // Create a new card & get the weather data from the server
     const card = getForecastCard(location);
     getForecastFromNetwork(location.geo).then(forecast => {
-        renderForecast(card, forecast);
+        renderForecast(card, forecast, "network");
     });
     // Save the updated list of selected cities.
     weatherApp.selectedLocations[location.geo] = location;
@@ -299,7 +299,16 @@ function geoError(err) {
  * @param {Element} card The card element to update.
  * @param {Object} data Weather forecast data to update the element with.
  */
-function renderForecast(card, data) {
+function setOnlineStatus(card, source) {
+    const statusTag = card.querySelector(".online-status-tag");
+    if (!statusTag) return;
+    const isOnline = source === "network";
+    statusTag.textContent = isOnline ? "online" : "offline";
+    statusTag.classList.toggle("status-online", isOnline);
+    statusTag.classList.toggle("status-offline", !isOnline);
+}
+
+function renderForecast(card, data, source = "network") {
     if (!data) {
         // There's no data, skip the update.
         return;
@@ -316,6 +325,8 @@ function renderForecast(card, data) {
     const sunSetLabel = formatTime(sunSet, data.timezone);
     const dayLightHours = (sunSet - sunRise) / 3600;
     console.log("Daylight Hours", dayLightHours);
+
+    setOnlineStatus(card, source);
 
     // Elevation
     if (data.elevation) {
@@ -409,7 +420,7 @@ function renderForecast(card, data) {
     forecastContainer.innerHTML = ""; // Clear existing
     if (data.daily && data.daily.data) {
         // skip the first 3 days, they are past and today's forecast
-        const futureDays = data.daily.data.slice(3);
+        const futureDays = data.daily.data.slice(8);
         futureDays.forEach((day) => {
             const dayElement = document.createElement("div");
             dayElement.classList.add("forecast-day");
@@ -571,11 +582,11 @@ function updateData() {
         // CODELAB: Add code to call getForecastFromCache
         getForecastFromCache(location.geo)
             .then((forecast) => {
-                renderForecast(card, forecast);
+                renderForecast(card, forecast, "cache");
             });
         // Get the forecast data from the network.
         getForecastFromNetwork(location.geo).then(forecast => {
-            renderForecast(card, forecast);
+            renderForecast(card, forecast, "network");
         });
     });
 }

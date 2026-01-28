@@ -9,6 +9,7 @@ const FORECAST_DELAY = 0;
 
 // Open-Meteo API Base URL
 const BASE_URL = 'https://api.open-meteo.com/v1/forecast';
+const PAST_DAYS = 7;
 
 // Fake forecast data used if we can't reach the API
 const fakeForecast = {
@@ -213,10 +214,19 @@ const weatherIcons = {
 const iconFallback = `${iconBasePath}/not-available.svg`;
 
 const windIcons = {
-  calm: `${iconBasePath}/wind-beaufort-0.svg`,
-  light: `${iconBasePath}/wind-beaufort-2.svg`,
-  moderate: `${iconBasePath}/wind-beaufort-5.svg`,
-  strong: `${iconBasePath}/wind-beaufort-7.svg`,
+  0: `${iconBasePath}/wind-beaufort-0.svg`,
+  1: `${iconBasePath}/wind-beaufort-1.svg`,
+  2: `${iconBasePath}/wind-beaufort-2.svg`,
+  3: `${iconBasePath}/wind-beaufort-3.svg`,
+  4: `${iconBasePath}/wind-beaufort-4.svg`,
+  5: `${iconBasePath}/wind-beaufort-5.svg`,
+  6: `${iconBasePath}/wind-beaufort-6.svg`,
+  7: `${iconBasePath}/wind-beaufort-7.svg`,
+  8: `${iconBasePath}/wind-beaufort-8.svg`,
+  9: `${iconBasePath}/wind-beaufort-9.svg`,
+  10: `${iconBasePath}/wind-beaufort-10.svg`,
+  11: `${iconBasePath}/wind-beaufort-11.svg`,
+  12: `${iconBasePath}/wind-beaufort-12.svg`,
 };
 
 const avalancheIcons = {
@@ -259,10 +269,19 @@ function calculateWindChill(tempF, windMph) {
 }
 
 function getWindLevel(windMph) {
-  if (windMph < 1) return "calm";
-  if (windMph < 10) return "light";
-  if (windMph < 20) return "moderate";
-  return "strong";
+  if (windMph < 1) return 0;
+  if (windMph < 4) return 1;
+  if (windMph < 8) return 2;
+  if (windMph < 13) return 3;
+  if (windMph < 19) return 4;
+  if (windMph < 25) return 5;
+  if (windMph < 32) return 6;
+  if (windMph < 39) return 7;
+  if (windMph < 47) return 8;
+  if (windMph < 55) return 9;
+  if (windMph < 64) return 10;
+  if (windMph < 73) return 11;
+  return 12;
 }
 
 function calculateAvalancheRisk(snowfall24h, recentSnowfall, windSpeed) {
@@ -317,10 +336,11 @@ function getWindIcon(windMph) {
   return windIcons[level] ?? iconFallback;
 }
 
-function getRidingCondition(snowfall24h, tempF) {
+function getRidingCondition(snowfall24h, tempF, recentHighs) {
   if (snowfall24h >= 6) return "epic powder";
   if (snowfall24h >= 2) return "powder";
-  if (tempF <= 20) return "ice";
+  const thawedRecently = (recentHighs || []).some((high) => high > 33);
+  if (thawedRecently && tempF < 29) return "ice";
   return "groomers";
 }
 
@@ -397,7 +417,7 @@ async function getForecast(req, resp) {
   // https://api.open-meteo.com/v1/forecast?latitude=40.03853&longitude=-92.4259&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,snowfall_sum,precipitation_sum,precipitation_probability_max&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,snowfall,weather_code,wind_speed_10m,wind_direction_10m&timezone=auto&past_days=2&forecast_days=3&timeformat=unixtime&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch
   // &daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,snowfall_sum,precipitation_sum,precipitation_probability_max&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,snowfall,weather_code,wind_speed_10m,wind_direction_10m&timezone=auto&past_days=2&forecast_days=5&timeformat=unixtime&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch
 
-  const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,snowfall_sum,precipitation_sum,precipitation_probability_max&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,precipitation_probability,snowfall,snowfall_height,weather_code,wind_speed_10m,wind_direction_10m&timezone=auto&past_days=2&forecast_days=7&timeformat=unixtime&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch`;
+  const url = `${BASE_URL}?latitude=${lat}&longitude=${lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,snowfall_sum,precipitation_sum,precipitation_probability_max&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,precipitation_probability,snowfall,snowfall_height,weather_code,wind_speed_10m,wind_direction_10m&timezone=auto&past_days=${PAST_DAYS}&forecast_days=7&timeformat=unixtime&wind_speed_unit=mph&temperature_unit=fahrenheit&precipitation_unit=inch`;
 
   console.log('Fetching Open-Meteo Data:', url);
   fetch(url).then((resp) => {
@@ -418,16 +438,23 @@ async function getForecast(req, resp) {
     const daily = data.daily;
     const isDay = current.is_day === 1;
     const iconKey = mapWeatherCodeToIcon(current.weather_code ?? 0, isDay);
+    const todayIndex = PAST_DAYS;
     const windDirLabel = degreesToCardinal(current.wind_direction_10m ?? 0);
     const windChill = calculateWindChill(current.temperature_2m ?? 0, current.wind_speed_10m ?? 0);
-    const snowfall24h = daily.snowfall_sum?.[2] ?? 0;
-    const ridingCondition = getRidingCondition(snowfall24h, current.temperature_2m ?? 0);
+    const snowfall24h = daily.snowfall_sum?.[todayIndex] ?? 0;
+    const tempsPastWeek = daily.temperature_2m_max.slice(
+      Math.max(0, todayIndex - 6),
+      todayIndex + 1
+    );
+    const ridingCondition = getRidingCondition(snowfall24h, current.temperature_2m ?? 0, tempsPastWeek);
 
     console.log('Current:', current);
     console.log('Daily:', daily);
-    const recentSnowfall = daily.snowfall_sum.slice(0, 3).map(sum => sum || 0);
+    const recentSnowfall = daily.snowfall_sum
+      .slice(Math.max(0, todayIndex - 2), todayIndex + 1)
+      .map(sum => sum || 0);
     const avalancheRisk = calculateAvalancheRisk(
-      daily[2]?.snowfall_sum || 0,
+      daily?.snowfall_sum?.[todayIndex] || 0,
       recentSnowfall,
       current.wind_speed_10m || 0
     );
@@ -457,8 +484,8 @@ async function getForecast(req, resp) {
         avalancheIcon: getAvalancheIcon(avalancheRisk),
         ridingCondition: ridingCondition,
         ridingConditionIcon: getRidingConditionIcon(ridingCondition),
-        sunrise: data.daily?.sunrise?.[2] * 1000, // we went 2 days back to get recent snow-fall
-        sunset: data.daily?.sunset?.[2] * 1000,
+        sunrise: data.daily?.sunrise?.[todayIndex] * 1000,
+        sunset: data.daily?.sunset?.[todayIndex] * 1000,
       },
       daily: {
         data: daily.time.map((time, index) => ({
